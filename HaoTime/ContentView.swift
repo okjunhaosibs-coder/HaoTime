@@ -2,11 +2,10 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text("HaoTime")
-            .font(.largeTitle)
+        #if os(macOS)
+        WeekView()
+        #else
+        ListView()
+        #endif
     }
-}
-
-#Preview {
-    ContentView()
 }

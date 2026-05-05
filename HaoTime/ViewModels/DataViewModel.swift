@@ -1,0 +1,125 @@
+import Foundation
+import SwiftData
+import SwiftUI
+import Observation
+
+@Observable
+final class DataViewModel {
+    var categories: [Category] = []
+    var activeCategories: [Category] {
+        categories.filter { !$0.isArchived }.sorted { $0.sortOrder < $1.sortOrder }
+    }
+
+    var dailyAggregates: [String: [UUID: TimeInterval]] = [:]
+
+    func fetchCategories(context: ModelContext) {
+        let descriptor = FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)])
+        categories = (try? context.fetch(descriptor)) ?? []
+        if categories.isEmpty {
+            createPresets(context: context)
+        }
+    }
+
+    private func createPresets(context: ModelContext) {
+        for (index, preset) in Category.presets.enumerated() {
+            let cat = Category(
+                name: preset.name,
+                colorHex: preset.colorHex,
+                iconName: preset.iconName,
+                sortOrder: index
+            )
+            context.insert(cat)
+        }
+        try? context.save()
+        categories = (try? context.fetch(FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)]))) ?? []
+    }
+
+    func sessionsForDate(_ date: Date, context: ModelContext) -> [Session] {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+        let descriptor = FetchDescriptor<Session>(
+            predicate: #Predicate { $0.startTime >= startOfDay && $0.startTime < endOfDay },
+            sortBy: [SortDescriptor(\.startTime)]
+        )
+        return (try? context.fetch(descriptor)) ?? []
+    }
+
+    func aggregateForWeek(containing date: Date, context: ModelContext) {
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: date)
+        let mondayOffset = weekday == 1 ? -6 : 2 - weekday
+        guard let monday = calendar.date(byAdding: .day, value: mondayOffset, to: date) else { return }
+        let startOfMonday = calendar.startOfDay(for: monday)
+
+        dailyAggregates = [:]
+
+        for dayOffset in 0..<7 {
+            guard let dayStart = calendar.date(byAdding: .day, value: dayOffset, to: startOfMonday) else { continue }
+            let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
+            let dateKey = Self.dateFormatter.string(from: dayStart)
+
+            let descriptor = FetchDescriptor<Session>(
+                predicate: #Predicate { $0.startTime >= dayStart && $0.startTime < dayEnd && $0.endTime != nil }
+            )
+            let sessions = (try? context.fetch(descriptor)) ?? []
+
+            var categoryDurations: [UUID: TimeInterval] = [:]
+            for session in sessions {
+                guard let catID = session.category?.id else { continue }
+                categoryDurations[catID, default: 0] += session.duration
+            }
+            dailyAggregates[dateKey] = categoryDurations
+        }
+    }
+
+    func totalDuration(for date: Date) -> TimeInterval {
+        let key = Self.dateFormatter.string(from: Calendar.current.startOfDay(for: date))
+        return dailyAggregates[key]?.values.reduce(0, +) ?? 0
+    }
+
+    func duration(for categoryID: UUID, on date: Date) -> TimeInterval {
+        let key = Self.dateFormatter.string(from: Calendar.current.startOfDay(for: date))
+        return dailyAggregates[key]?[categoryID] ?? 0
+    }
+
+    func addCategory(name: String, colorHex: String, iconName: String, context: ModelContext) {
+        let maxOrder = categories.map(\.sortOrder).max() ?? -1
+        let cat = Category(name: name, colorHex: colorHex, iconName: iconName, sortOrder: maxOrder + 1)
+        context.insert(cat)
+        try? context.save()
+        fetchCategories(context: context)
+    }
+
+    func updateCategory(_ category: Category, context: ModelContext) {
+        try? context.save()
+        fetchCategories(context: context)
+    }
+
+    func archiveCategory(_ category: Category, context: ModelContext) {
+        guard activeCategories.count > 1 else { return }
+        category.isArchived = true
+        try? context.save()
+        fetchCategories(context: context)
+    }
+
+    func moveCategory(from source: IndexSet, to destination: Int, context: ModelContext) {
+        var active = activeCategories
+        active.move(fromOffsets: source, toOffset: destination)
+        for (index, cat) in active.enumerated() {
+            cat.sortOrder = index
+        }
+        try? context.save()
+        fetchCategories(context: context)
+    }
+
+    func deleteSession(_ session: Session, context: ModelContext) {
+        context.delete(session)
+        try? context.save()
+    }
+
+    static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
+}
