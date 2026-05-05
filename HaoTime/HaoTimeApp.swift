@@ -1,10 +1,3 @@
-//
-//  HaoTimeApp.swift
-//  HaoTime
-//
-//  Created by Junhao Hu on 2026/5/5.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -12,7 +5,8 @@ import SwiftData
 struct HaoTimeApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Category.self,
+            Session.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
