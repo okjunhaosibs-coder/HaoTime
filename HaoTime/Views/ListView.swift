@@ -57,7 +57,8 @@ struct ListView: View {
                 date: Date(),
                 categories: dataVM.activeCategories,
                 dataVM: dataVM,
-                ringSize: 80
+                ringSize: 80,
+                context: modelContext
             )
         }
     }

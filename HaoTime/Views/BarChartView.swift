@@ -3,6 +3,7 @@ import SwiftUI
 struct BarChartView: View {
     let items: [(name: String, color: Color, duration: TimeInterval)]
     let maxHours: Double = 12.0
+    var onTap: ((String) -> Void)?
 
     var body: some View {
         VStack(spacing: 10) {
@@ -35,6 +36,10 @@ struct BarChartView: View {
                         .foregroundStyle(.secondary)
                         .frame(width: 52, alignment: .trailing)
                 }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    onTap?(item.name)
+                }
             }
         }
         .padding(.horizontal, 8)
@@ -49,4 +54,15 @@ struct BarChartView: View {
         }
         return "\(m)m"
     }
+}
+
+#Preview("Bar Chart - With Data") {
+    BarChartView(items: [
+        ("写作", Color(hex: "#B395BD"), 7200),
+        ("思考", Color(hex: "#4ECDC4"), 5400),
+        ("杂事", Color(hex: "#FFD93D"), 0),
+        ("运动", Color(hex: "#FF6B6B"), 3600),
+    ])
+    .frame(width: 360)
+    .padding()
 }

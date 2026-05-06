@@ -22,7 +22,8 @@ struct WeekView: View {
                 date: selectedDate,
                 categories: dataVM.activeCategories,
                 dataVM: dataVM,
-                ringSize: 160
+                ringSize: 150,
+                context: modelContext
             )
 
             Divider()
@@ -39,7 +40,7 @@ struct WeekView: View {
     }
 
     private var weekStrip: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 16) {
             HStack {
                 Button(action: { shiftWeek(by: -1) }) {
                     Image(systemName: "chevron.left")
@@ -56,9 +57,9 @@ struct WeekView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.top, 8)
+            .padding(.top, 12)
 
-            HStack(spacing: 8) {
+            HStack(spacing: 16) {
                 ForEach(daysInWeek, id: \.self) { date in
                     DayColumn(
                         date: date,
@@ -70,8 +71,8 @@ struct WeekView: View {
                     )
                 }
             }
-            .padding(.horizontal)
-            .padding(.bottom, 12)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 24)
         }
     }
 
@@ -111,4 +112,10 @@ struct WeekView: View {
         guard let monday = calendar.date(byAdding: .day, value: offset, to: date) else { return date }
         return calendar.startOfDay(for: monday)
     }
+}
+
+#Preview("Week View - Mac Layout") {
+    WeekView()
+        .modelContainer(PreviewHelpers.previewContainer)
+        .frame(width: 900, height: 600)
 }
