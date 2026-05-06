@@ -15,7 +15,8 @@ struct WeekView: View {
             TimerBar(
                 categories: dataVM.activeCategories,
                 timerVM: timerVM,
-                modelContext: modelContext
+                modelContext: modelContext,
+                onDataDidChange: { refreshData() }
             )
 
             Divider()
@@ -54,6 +55,9 @@ struct WeekView: View {
         .onChange(of: weekStartDate) { _, _ in refreshData() }
         .onChange(of: showCategorySessions) { _, newValue in
             if !newValue { refreshData() }
+        }
+        .onChange(of: timerVM.isRunning) { _, running in
+            if !running { refreshData() }
         }
     }
 

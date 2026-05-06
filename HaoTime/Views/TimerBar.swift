@@ -5,6 +5,7 @@ struct TimerBar: View {
     let categories: [Category]
     @Bindable var timerVM: TimerViewModel
     var modelContext: ModelContext
+    var onDataDidChange: (() -> Void)?
 
     @State private var showManualAdd = false
     @State private var showSettings = false
@@ -19,10 +20,15 @@ struct TimerBar: View {
     }
 
     var body: some View {
-        if isCompact {
-            compactLayout
-        } else {
-            regularLayout
+        Group {
+            if isCompact {
+                compactLayout
+            } else {
+                regularLayout
+            }
+        }
+        .onChange(of: showManualAdd) { _, showing in
+            if !showing { onDataDidChange?() }
         }
     }
 
@@ -136,7 +142,7 @@ struct TimerBar: View {
             }
         } label: {
             Image(systemName: "ellipsis.circle")
-                .font(.title3)
+                .font(.title2)
         }
         .menuStyle(.borderlessButton)
     }

@@ -16,7 +16,8 @@ struct ListView: View {
             TimerBar(
                 categories: dataVM.activeCategories,
                 timerVM: timerVM,
-                modelContext: modelContext
+                modelContext: modelContext,
+                onDataDidChange: { refreshData() }
             )
 
             ScrollView {
@@ -67,6 +68,9 @@ struct ListView: View {
         .onChange(of: showCategorySessions) { _, newValue in
             if !newValue { refreshData() }
         }
+        .onChange(of: timerVM.isRunning) { _, running in
+            if !running { refreshData() }
+        }
     }
 
     private var todayDetail: some View {
@@ -100,10 +104,11 @@ struct ListView: View {
     private var weekCards: some View {
         VStack(spacing: 8) {
             Text("本周")
-                .font(.caption)
+                .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
+                .padding(.horizontal, 24)
+                .padding(.top, 5)
 
             ForEach(daysInWeek, id: \.self) { date in
                 if date <= Date() {
@@ -163,67 +168,101 @@ struct DayCard: View {
     let isToday: Bool
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .center, spacing: 10) {
+            // Left: date info
+            VStack(alignment: .leading, spacing: 1) {
+                if isToday {
+                    Text("今天")
+                        .font(.system(size: 9))
+                        .foregroundStyle(Color.accentColor)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(Color.accentColor.opacity(0.15))
+                        .clipShape(Capsule())
+                } else {
+                    Text("今天")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.clear)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                }
+                HStack(spacing: 3) {
+                    Text(dayOfWeek)
+                        .font(.system(size: 12, weight: .medium))
+                    Text("·")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.secondary)
+                    Text(monthDay)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                .fixedSize(horizontal: true, vertical: false)
+            }
+            .frame(width: 68)
+
+            // Center: ring + right: bar + stats
             let durations = categories.compactMap { cat -> (color: Color, duration: TimeInterval)? in
                 let d = dataVM.duration(for: cat.id, on: date)
                 return d > 0 ? (Color(hex: cat.colorHex), d) : nil
             }
-            RingView(categoryDurations: durations, size: 44, lineWidth: 5)
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack {
-                    Text(formattedDate)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    if isToday {
-                        Text("今天")
-                            .font(.caption2)
-                            .foregroundStyle(Color.accentColor)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 1)
-                            .background(Color.accentColor.opacity(0.15))
-                            .clipShape(Capsule())
-                    }
-                }
-                ForEach(categories) { cat in
-                    let d = dataVM.duration(for: cat.id, on: date)
-                    if d > 0 {
-                        HStack(spacing: 4) {
+            HStack(spacing: 8) {
+                RingView(categoryDurations: durations, size: 34, lineWidth: 4)
+
+                HStack(spacing: 6) {
+                VStack(alignment: .leading, spacing: 3) {
+                    ForEach(categories) { cat in
+                        let d = dataVM.duration(for: cat.id, on: date)
+                        if d > 0 {
                             RoundedRectangle(cornerRadius: 2)
                                 .fill(Color(hex: cat.colorHex))
-                                .frame(width: max(CGFloat(d / (12 * 3600)) * 120, 4), height: 6)
+                                .frame(width: max(CGFloat(d / (12 * 3600)) * 120, 3), height: 5)
                         }
                     }
                 }
-                HStack(spacing: 4) {
-                    let total = dataVM.totalDuration(for: date)
-                    if total > 0 {
+                .padding(.leading, 15)
+
+                let total = dataVM.totalDuration(for: date)
+                let count = categories.filter { dataVM.duration(for: $0.id, on: date) > 0 }.count
+                if total > 0 {
+                    VStack(alignment: .leading, spacing: 1) {
                         Text(formatTotal(total))
-                            .font(.caption2)
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
                             .foregroundStyle(.secondary)
-                    }
-                    let count = categories.filter { dataVM.duration(for: $0.id, on: date) > 0 }.count
-                    if count > 0 {
-                        Text("· \(count) 个类别")
-                            .font(.caption2)
+                        Text("\(count) 个类别")
+                            .font(.system(size: 9))
                             .foregroundStyle(.tertiary)
                     }
+                    .padding(.leading, 30)
                 }
             }
-            Spacer()
+
+            }
+            .padding(.leading, 20)
+
+            Spacer(minLength: 2)
+
             Image(systemName: "chevron.right")
-                .font(.caption2)
+                .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
         }
-        .padding(12)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
         .background(Color.gray.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
-    private var formattedDate: String {
+    private var dayOfWeek: String {
         let f = DateFormatter()
-        f.dateFormat = "E · M月d日"
+        f.dateFormat = "E"
         f.locale = Locale(identifier: "zh_CN")
+        return f.string(from: date)
+    }
+
+    private var monthDay: String {
+        let f = DateFormatter()
+        f.dateFormat = "M月d日"
         return f.string(from: date)
     }
 
@@ -238,30 +277,45 @@ struct FutureDayCard: View {
     let date: Date
 
     var body: some View {
-        HStack(spacing: 12) {
-            Circle()
-                .stroke(Color.gray.opacity(0.08), lineWidth: 5)
-                .frame(width: 44, height: 44)
-            VStack(alignment: .leading) {
-                Text(formattedDate)
-                    .font(.subheadline)
+        HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(dayOfWeek)
+                    .font(.caption)
                     .foregroundStyle(.tertiary)
-                Text("--")
+                Text(monthDay)
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
+            .frame(width: 48, alignment: .leading)
+
+            Circle()
+                .stroke(Color.gray.opacity(0.08), lineWidth: 4)
+                .frame(width: 36, height: 36)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("--")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.tertiary)
+            }
+
             Spacer()
         }
-        .padding(12)
+        .padding(10)
         .background(Color.gray.opacity(0.03))
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .opacity(0.4)
     }
 
-    private var formattedDate: String {
+    private var dayOfWeek: String {
         let f = DateFormatter()
-        f.dateFormat = "E · M月d日"
+        f.dateFormat = "E"
         f.locale = Locale(identifier: "zh_CN")
+        return f.string(from: date)
+    }
+
+    private var monthDay: String {
+        let f = DateFormatter()
+        f.dateFormat = "M/d"
         return f.string(from: date)
     }
 }
