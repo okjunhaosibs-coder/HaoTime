@@ -57,28 +57,41 @@ struct WeekView: View {
         }
     }
 
+    private let visibleWeekCount = 4
+
     private var weekStrip: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Button(action: { shiftWeek(by: -1) }) {
-                    Image(systemName: "chevron.left")
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(spacing: 24) {
+                ForEach(0..<visibleWeekCount, id: \.self) { weekOffset in
+                    let weekStart = Calendar.current.date(byAdding: .weekOfYear, value: -weekOffset, to: weekStartDate)!
+                    weekRow(starting: weekStart)
                 }
-                .buttonStyle(.plain)
-
-                Text(weekRangeText)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 160)
-
-                Button(action: { shiftWeek(by: 1) }) {
-                    Image(systemName: "chevron.right")
-                }
-                .buttonStyle(.plain)
             }
-            .padding(.top, 12)
+            .padding(.vertical, 12)
+        }
+    }
+
+    private func weekRow(starting monday: Date) -> some View {
+        let days = (0..<7).compactMap {
+            Calendar.current.date(byAdding: .day, value: $0, to: monday)
+        }
+        let endDate = Calendar.current.date(byAdding: .day, value: 6, to: monday)!
+        let isCurrentWeek = Calendar.current.isDate(monday, equalTo: weekStartDate, toGranularity: .weekOfYear)
+
+        return VStack(spacing: 10) {
+            HStack {
+                if isCurrentWeek {
+                    Circle()
+                        .fill(Color.accentColor)
+                        .frame(width: 6, height: 6)
+                }
+                Text(weekRange(for: monday, ending: endDate))
+                    .font(.caption)
+                    .foregroundStyle(isCurrentWeek ? Color.accentColor : .secondary)
+            }
 
             HStack(spacing: 16) {
-                ForEach(daysInWeek, id: \.self) { date in
+                ForEach(days, id: \.self) { date in
                     DayColumn(
                         date: date,
                         categories: dataVM.activeCategories,
@@ -89,31 +102,18 @@ struct WeekView: View {
                     )
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 24)
         }
+        .padding(.horizontal, 16)
     }
 
-    private var daysInWeek: [Date] {
-        (0..<7).compactMap {
-            Calendar.current.date(byAdding: .day, value: $0, to: weekStartDate)
-        }
-    }
-
-    private var weekRangeText: String {
-        let endDate = Calendar.current.date(byAdding: .day, value: 6, to: weekStartDate)!
+    private func weekRange(for start: Date, ending end: Date) -> String {
         let f = DateFormatter()
         f.dateFormat = "M月d日"
-        return "\(f.string(from: weekStartDate)) — \(f.string(from: endDate))"
-    }
-
-    private func shiftWeek(by weeks: Int) {
-        guard let newStart = Calendar.current.date(byAdding: .weekOfYear, value: weeks, to: weekStartDate) else { return }
-        weekStartDate = newStart
+        return "\(f.string(from: start)) — \(f.string(from: end))"
     }
 
     private func refreshData() {
-        dataVM.aggregateForWeek(containing: weekStartDate, context: modelContext)
+        dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: weekStartDate, context: modelContext)
     }
 
     private func resumeActiveSession() {

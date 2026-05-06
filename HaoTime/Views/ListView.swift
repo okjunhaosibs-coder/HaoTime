@@ -40,6 +40,17 @@ struct ListView: View {
                 DaySessionsView(date: date, context: modelContext)
             }
         }
+#if os(iOS)
+        .sheet(isPresented: $showCategorySessions) {
+            if let cat = tappedCategory {
+                CategorySessionsView(
+                    date: selectedDate ?? Date(),
+                    category: cat,
+                    context: modelContext
+                )
+            }
+        }
+#else
         .popover(isPresented: $showCategorySessions) {
             if let cat = tappedCategory {
                 CategorySessionsView(
@@ -49,6 +60,7 @@ struct ListView: View {
                 )
             }
         }
+#endif
         .onChange(of: showDayDetail) { _, newValue in
             if !newValue { refreshData() }
         }

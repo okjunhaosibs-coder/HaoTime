@@ -55,21 +55,41 @@ final class DataViewModel {
 
         for dayOffset in 0..<7 {
             guard let dayStart = calendar.date(byAdding: .day, value: dayOffset, to: startOfMonday) else { continue }
-            let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
-            let dateKey = Self.dateFormatter.string(from: dayStart)
-
-            let descriptor = FetchDescriptor<Session>(
-                predicate: #Predicate { $0.startTime >= dayStart && $0.startTime < dayEnd && $0.endTime != nil }
-            )
-            let sessions = (try? context.fetch(descriptor)) ?? []
-
-            var categoryDurations: [UUID: TimeInterval] = [:]
-            for session in sessions {
-                guard let catID = session.category?.id else { continue }
-                categoryDurations[catID, default: 0] += session.duration
-            }
-            dailyAggregates[dateKey] = categoryDurations
+            aggregateDay(dayStart, context: context)
         }
+    }
+
+    func aggregateForWeeks(weekCount: Int, endingOn date: Date, context: ModelContext) {
+        dailyAggregates = [:]
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: date)
+        let mondayOffset = weekday == 1 ? -6 : 2 - weekday
+        guard let monday = calendar.date(byAdding: .day, value: mondayOffset, to: date) else { return }
+        let startOfMonday = calendar.startOfDay(for: monday)
+        let totalDays = weekCount * 7
+
+        for dayOffset in 0..<totalDays {
+            guard let dayStart = calendar.date(byAdding: .day, value: dayOffset, to: startOfMonday) else { continue }
+            aggregateDay(dayStart, context: context)
+        }
+    }
+
+    private func aggregateDay(_ dayStart: Date, context: ModelContext) {
+        let calendar = Calendar.current
+        let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
+        let dateKey = Self.dateFormatter.string(from: dayStart)
+
+        let descriptor = FetchDescriptor<Session>(
+            predicate: #Predicate { $0.startTime >= dayStart && $0.startTime < dayEnd && $0.endTime != nil }
+        )
+        let sessions = (try? context.fetch(descriptor)) ?? []
+
+        var categoryDurations: [UUID: TimeInterval] = [:]
+        for session in sessions {
+            guard let catID = session.category?.id else { continue }
+            categoryDurations[catID, default: 0] += session.duration
+        }
+        dailyAggregates[dateKey] = categoryDurations
     }
 
     func totalDuration(for date: Date) -> TimeInterval {

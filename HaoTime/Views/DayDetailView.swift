@@ -25,21 +25,16 @@ struct DayDetailView: View {
             return (Color(hex: cat.colorHex), d)
         }
         let total = dataVM.totalDuration(for: date)
-        let activeCount = categories.filter { dataVM.duration(for: $0.id, on: date) > 0 }.count
 
         return RingView(
             categoryDurations: durations,
             size: ringSize
         )
         .overlay {
-            VStack(spacing: 2) {
-                Text(formatTotalHours(total))
-                    .font(.system(.title2, design: .rounded))
-                    .fontWeight(.semibold)
-                Text("\(activeCount) 个类别有记录")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-            }
+            Text(formatTotalHours(total))
+                .font(.system(size: 15, design: .rounded))
+                .fontWeight(.semibold)
+                .foregroundColor(Color(hex: "#36494F"))
         }
     }
 
