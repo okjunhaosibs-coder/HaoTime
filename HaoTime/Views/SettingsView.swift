@@ -134,7 +134,7 @@ struct CategoryEditView: View {
                     dataVM.archiveCategory(category, context: modelContext)
                     dismiss()
                 } label: {
-                    Text("归档类别")
+                    Text("删除类别")
                 }
             }
         }

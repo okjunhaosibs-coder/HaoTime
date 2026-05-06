@@ -57,6 +57,35 @@ struct RingView: View {
     }
 }
 
+#Preview("Ring - Empty") {
+    RingView(categoryDurations: [], size: 200)
+        .padding()
+        .background(Color.black)
+}
+
+#Preview("Ring - 3 Segments") {
+    let d: [(color: Color, duration: TimeInterval)] = [
+        (Color(hex: "#B395BD"), 7200),
+        (Color(hex: "#4ECDC4"), 5400),
+        (Color(hex: "#FF6B6B"), 3600),
+    ]
+    return RingView(categoryDurations: d, size: 200)
+        .padding()
+        .background(Color.black)
+}
+
+#Preview("Ring - Full >12h") {
+    let d: [(color: Color, duration: TimeInterval)] = [
+        (Color(hex: "#B395BD"), 18000),
+        (Color(hex: "#4ECDC4"), 14400),
+        (Color(hex: "#FF6B6B"), 10800),
+        (Color(hex: "#FFD93D"), 7200),
+    ]
+    return RingView(categoryDurations: d, size: 160)
+        .padding()
+        .background(Color.black)
+}
+
 struct Arc: Shape {
     let startAngle: Angle
     let endAngle: Angle

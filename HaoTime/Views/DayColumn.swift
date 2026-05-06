@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct DayColumn: View {
     let date: Date
@@ -22,9 +23,11 @@ struct DayColumn: View {
                     Circle()
                         .stroke(Color.gray.opacity(0.08), lineWidth: 4)
                         .frame(width: 44, height: 44)
+                    Spacer().frame(height: CGFloat(categories.count * 5))
                     Text("--")
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
+                        .frame(height: 12)
                 } else {
                     ringPreview
                         .frame(width: 44, height: 44)
@@ -58,14 +61,12 @@ struct DayColumn: View {
         VStack(spacing: 1) {
             ForEach(categories) { cat in
                 let d = dataVM.duration(for: cat.id, on: date)
-                if d > 0 {
-                    RoundedRectangle(cornerRadius: 1)
-                        .fill(Color(hex: cat.colorHex))
-                        .frame(
-                            width: max(CGFloat(d / (12 * 3600)) * 56, 4),
-                            height: 4
-                        )
-                }
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(d > 0 ? Color(hex: cat.colorHex) : Color.clear)
+                    .frame(
+                        width: d > 0 ? max(CGFloat(d / (12 * 3600)) * 56, 4) : 0,
+                        height: 4
+                    )
             }
         }
         .frame(height: CGFloat(categories.count * 5), alignment: .leading)
@@ -78,6 +79,7 @@ struct DayColumn: View {
         return Text(total > 0 ? "\(h)h \(m)m" : "--")
             .font(.system(size: 10))
             .foregroundStyle(isToday ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.secondary))
+            .frame(height: 12)
     }
 
     private var dayOfWeek: String {
@@ -92,4 +94,22 @@ struct DayColumn: View {
         formatter.dateFormat = "M/d"
         return formatter.string(from: date)
     }
+}
+
+#Preview("Day Column - Today") {
+    let context = PreviewHelpers.previewContainer.mainContext
+    let vm = DataViewModel()
+    vm.fetchCategories(context: context)
+    vm.aggregateForWeek(containing: Date(), context: context)
+    return DayColumn(date: Date(), categories: vm.activeCategories, dataVM: vm, isToday: true, isFuture: false, action: {})
+        .frame(width: 120, height: 180)
+}
+
+#Preview("Day Column - Future") {
+    let context = PreviewHelpers.previewContainer.mainContext
+    let vm = DataViewModel()
+    vm.fetchCategories(context: context)
+    let futureDate = Calendar.current.date(byAdding: .day, value: 3, to: Date())!
+    return DayColumn(date: futureDate, categories: vm.activeCategories, dataVM: vm, isToday: false, isFuture: true, action: {})
+        .frame(width: 120, height: 180)
 }

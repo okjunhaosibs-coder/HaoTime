@@ -7,6 +7,8 @@ struct WeekView: View {
     @State private var timerVM = TimerViewModel()
     @State private var selectedDate: Date = Date()
     @State private var weekStartDate: Date = WeekView.mondayOfWeek(containing: Date())
+    @State private var tappedCategory: Category?
+    @State private var showCategorySessions = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,7 +25,11 @@ struct WeekView: View {
                 categories: dataVM.activeCategories,
                 dataVM: dataVM,
                 ringSize: 150,
-                context: modelContext
+                context: modelContext,
+                onCategoryTap: { cat in
+                    tappedCategory = cat
+                    showCategorySessions = true
+                }
             )
 
             Divider()
@@ -31,12 +37,24 @@ struct WeekView: View {
             weekStrip
         }
         .frame(minWidth: 700, minHeight: 500)
+        .popover(isPresented: $showCategorySessions) {
+            if let cat = tappedCategory {
+                CategorySessionsView(
+                    date: selectedDate,
+                    category: cat,
+                    context: modelContext
+                )
+            }
+        }
         .onAppear {
             dataVM.fetchCategories(context: modelContext)
             refreshData()
             resumeActiveSession()
         }
         .onChange(of: weekStartDate) { _, _ in refreshData() }
+        .onChange(of: showCategorySessions) { _, newValue in
+            if !newValue { refreshData() }
+        }
     }
 
     private var weekStrip: some View {

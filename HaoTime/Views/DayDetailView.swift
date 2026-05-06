@@ -7,9 +7,7 @@ struct DayDetailView: View {
     let dataVM: DataViewModel
     let ringSize: CGFloat
     let context: ModelContext
-
-    @State private var selectedCategory: Category?
-    @State private var showCategorySessions = false
+    var onCategoryTap: ((Category) -> Void)?
 
     var body: some View {
         HStack(alignment: .center, spacing: 24) {
@@ -19,15 +17,6 @@ struct DayDetailView: View {
         .padding(.leading, 32)
         .padding(.trailing)
         .padding(.vertical, 32)
-        .sheet(isPresented: $showCategorySessions) {
-            if let cat = selectedCategory {
-                CategorySessionsView(
-                    date: date,
-                    category: cat,
-                    context: context
-                )
-            }
-        }
     }
 
     private var ringSection: some View {
@@ -60,8 +49,7 @@ struct DayDetailView: View {
         }
         return BarChartView(items: items) { tappedName in
             if let cat = categories.first(where: { $0.name == tappedName }) {
-                selectedCategory = cat
-                showCategorySessions = true
+                onCategoryTap?(cat)
             }
         }
     }
