@@ -5,8 +5,7 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var dataVM = DataViewModel()
-    @State private var editingCategory: Category?
-    @State private var showingAddSheet = false
+    @State private var navigationPath = NavigationPath()
 
     let colorOptions = [
         "#B395BD", "#4ECDC4", "#FFD93D", "#FF6B6B",
@@ -14,11 +13,11 @@ struct SettingsView: View {
     ]
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             List {
                 ForEach(dataVM.categories.filter { !$0.isArchived }) { category in
                     Button {
-                        editingCategory = category
+                        navigationPath.append(category)
                     } label: {
                         HStack(spacing: 12) {
                             RoundedRectangle(cornerRadius: 3)
@@ -47,7 +46,7 @@ struct SettingsView: View {
 
                 Section {
                     Button {
-                        showingAddSheet = true
+                        navigationPath.append("new")
                     } label: {
                         Label("添加类别", systemImage: "plus")
                     }
@@ -59,17 +58,20 @@ struct SettingsView: View {
                     Button("完成") { dismiss() }
                 }
             }
-            .sheet(item: $editingCategory) { category in
+            .navigationDestination(for: Category.self) { category in
                 CategoryEditView(
                     category: category,
                     dataVM: dataVM,
                     colorOptions: colorOptions
                 )
             }
-            .sheet(isPresented: $showingAddSheet) {
-                CategoryAddView(dataVM: dataVM, colorOptions: colorOptions)
+            .navigationDestination(for: String.self) { value in
+                if value == "new" {
+                    CategoryAddView(dataVM: dataVM, colorOptions: colorOptions)
+                }
             }
         }
+        .frame(minWidth: 400, minHeight: 400)
         .onAppear {
             dataVM.fetchCategories(context: modelContext)
         }
@@ -90,63 +92,58 @@ struct CategoryEditView: View {
     ]
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("名称") {
-                    TextField("类别名称", text: $category.name)
-                }
-                Section("颜色") {
-                    LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4)) {
-                        ForEach(colorOptions, id: \.self) { hex in
-                            Button {
-                                category.colorHex = hex
-                            } label: {
-                                Circle()
-                                    .fill(Color(hex: hex))
-                                    .frame(width: 36, height: 36)
-                                    .overlay(
-                                        category.colorHex == hex ?
-                                        Circle().stroke(Color.white, lineWidth: 2) : nil
-                                    )
-                            }
-                            .buttonStyle(.plain)
+        Form {
+            Section("名称") {
+                TextField("类别名称", text: $category.name)
+            }
+            Section("颜色") {
+                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4)) {
+                    ForEach(colorOptions, id: \.self) { hex in
+                        Button {
+                            category.colorHex = hex
+                        } label: {
+                            Circle()
+                                .fill(Color(hex: hex))
+                                .frame(width: 36, height: 36)
+                                .overlay(
+                                    category.colorHex == hex ?
+                                    Circle().stroke(Color.white, lineWidth: 2) : nil
+                                )
                         }
-                    }
-                }
-                Section("图标") {
-                    LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 6)) {
-                        ForEach(iconOptions, id: \.self) { icon in
-                            Button {
-                                category.iconName = icon
-                            } label: {
-                                Image(systemName: icon)
-                                    .font(.title3)
-                                    .foregroundStyle(category.iconName == icon ? Color(hex: category.colorHex) : .secondary)
-                                    .frame(width: 36, height: 36)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-                Section {
-                    Button(role: .destructive) {
-                        dataVM.archiveCategory(category, context: modelContext)
-                        dismiss()
-                    } label: {
-                        Text("归档类别")
+                        .buttonStyle(.plain)
                     }
                 }
             }
-            .navigationTitle("编辑类别")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
-                        dataVM.updateCategory(category, context: modelContext)
-                        dismiss()
+            Section("图标") {
+                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 6)) {
+                    ForEach(iconOptions, id: \.self) { icon in
+                        Button {
+                            category.iconName = icon
+                        } label: {
+                            Image(systemName: icon)
+                                .font(.title3)
+                                .foregroundStyle(category.iconName == icon ? Color(hex: category.colorHex) : .secondary)
+                                .frame(width: 36, height: 36)
+                        }
+                        .buttonStyle(.plain)
                     }
+                }
+            }
+            Section {
+                Button(role: .destructive) {
+                    dataVM.archiveCategory(category, context: modelContext)
+                    dismiss()
+                } label: {
+                    Text("归档类别")
+                }
+            }
+        }
+        .navigationTitle("编辑类别")
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("保存") {
+                    dataVM.updateCategory(category, context: modelContext)
+                    dismiss()
                 }
             }
         }
@@ -169,60 +166,58 @@ struct CategoryAddView: View {
     ]
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("名称") {
-                    TextField("类别名称", text: $name)
-                }
-                Section("颜色") {
-                    LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4)) {
-                        ForEach(colorOptions, id: \.self) { hex in
-                            Button {
-                                selectedColor = hex
-                            } label: {
-                                Circle()
-                                    .fill(Color(hex: hex))
-                                    .frame(width: 36, height: 36)
-                                    .overlay(
-                                        selectedColor == hex ?
-                                        Circle().stroke(Color.white, lineWidth: 2) : nil
-                                    )
-                            }
-                            .buttonStyle(.plain)
+        Form {
+            Section("名称") {
+                TextField("类别名称", text: $name)
+            }
+            Section("颜色") {
+                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4)) {
+                    ForEach(colorOptions, id: \.self) { hex in
+                        Button {
+                            selectedColor = hex
+                        } label: {
+                            Circle()
+                                .fill(Color(hex: hex))
+                                .frame(width: 36, height: 36)
+                                .overlay(
+                                    selectedColor == hex ?
+                                    Circle().stroke(Color.white, lineWidth: 2) : nil
+                                )
                         }
-                    }
-                }
-                Section("图标") {
-                    LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 6)) {
-                        ForEach(iconOptions, id: \.self) { icon in
-                            Button {
-                                selectedIcon = icon
-                            } label: {
-                                Image(systemName: icon)
-                                    .font(.title3)
-                                    .foregroundStyle(selectedIcon == icon ? Color(hex: selectedColor) : .secondary)
-                                    .frame(width: 36, height: 36)
-                            }
-                            .buttonStyle(.plain)
-                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }
-            .navigationTitle("新增类别")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("添加") {
-                        dataVM.addCategory(
-                            name: name.isEmpty ? "新类别" : name,
-                            colorHex: selectedColor,
-                            iconName: selectedIcon,
-                            context: modelContext
-                        )
-                        dismiss()
+            Section("图标") {
+                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 6)) {
+                    ForEach(iconOptions, id: \.self) { icon in
+                        Button {
+                            selectedIcon = icon
+                        } label: {
+                            Image(systemName: icon)
+                                .font(.title3)
+                                .foregroundStyle(selectedIcon == icon ? Color(hex: selectedColor) : .secondary)
+                                .frame(width: 36, height: 36)
+                        }
+                        .buttonStyle(.plain)
                     }
+                }
+            }
+        }
+        .navigationTitle("新增类别")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("取消") { dismiss() }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("添加") {
+                    dataVM.addCategory(
+                        name: name.isEmpty ? "新类别" : name,
+                        colorHex: selectedColor,
+                        iconName: selectedIcon,
+                        context: modelContext
+                    )
+                    dismiss()
                 }
             }
         }
