@@ -7,6 +7,8 @@ struct ListView: View {
     @State private var timerVM = TimerViewModel()
     @State private var selectedDate: Date?
     @State private var showDayDetail = false
+    @State private var tappedCategory: Category?
+    @State private var showCategorySessions = false
     @State private var weekStartDate: Date = WeekView.mondayOfWeek(containing: Date())
 
     var body: some View {
@@ -38,6 +40,21 @@ struct ListView: View {
                 DaySessionsView(date: date, context: modelContext)
             }
         }
+        .popover(isPresented: $showCategorySessions) {
+            if let cat = tappedCategory {
+                CategorySessionsView(
+                    date: selectedDate ?? Date(),
+                    category: cat,
+                    context: modelContext
+                )
+            }
+        }
+        .onChange(of: showDayDetail) { _, newValue in
+            if !newValue { refreshData() }
+        }
+        .onChange(of: showCategorySessions) { _, newValue in
+            if !newValue { refreshData() }
+        }
     }
 
     private var todayDetail: some View {
@@ -58,7 +75,12 @@ struct ListView: View {
                 categories: dataVM.activeCategories,
                 dataVM: dataVM,
                 ringSize: 80,
-                context: modelContext
+                context: modelContext,
+                onCategoryTap: { cat in
+                    tappedCategory = cat
+                    selectedDate = Date()
+                    showCategorySessions = true
+                }
             )
         }
     }
@@ -230,4 +252,16 @@ struct FutureDayCard: View {
         f.locale = Locale(identifier: "zh_CN")
         return f.string(from: date)
     }
+}
+
+#Preview("iPhone 17") {
+    ListView()
+        .modelContainer(PreviewHelpers.previewContainer)
+        .previewDevice("iPhone 17")
+}
+
+#Preview("iPhone 17 Pro") {
+    ListView()
+        .modelContainer(PreviewHelpers.previewContainer)
+        .previewDevice("iPhone 17 Pro")
 }
