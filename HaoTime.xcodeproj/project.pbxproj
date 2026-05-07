@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		201978932FACC3DC00FBFEBB /* HaoTimeWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 201978892FACC3DA00FBFEBB /* HaoTimeWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		201978F22FACCE6900FBFEBB /* HaoTimeWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201978E12FACCBF200FBFEBB /* HaoTimeWatchApp.swift */; };
+		201978F32FACCE6900FBFEBB /* WatchMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201978E22FACCBF200FBFEBB /* WatchMainView.swift */; };
+		201978F42FACCE6900FBFEBB /* WatchTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201978E32FACCBF200FBFEBB /* WatchTimerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +53,9 @@
 
 /* Begin PBXFileReference section */
 		201978892FACC3DA00FBFEBB /* HaoTimeWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HaoTimeWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		201978E12FACCBF200FBFEBB /* HaoTimeWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HaoTimeWatchApp.swift; sourceTree = "<group>"; };
+		201978E22FACCBF200FBFEBB /* WatchMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMainView.swift; sourceTree = "<group>"; };
+		201978E32FACCBF200FBFEBB /* WatchTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTimerView.swift; sourceTree = "<group>"; };
 		20EBFFC62FAA390900EB44BC /* HaoTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HaoTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		20EBFFD52FAA390B00EB44BC /* HaoTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HaoTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		20EBFFDF2FAA390B00EB44BC /* HaoTimeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HaoTimeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,6 +65,7 @@
 		201978992FACC69300FBFEBB /* Exceptions for "HaoTime" folder in "HaoTimeWatch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Helpers/ColorHex.swift,
 				Helpers/LayoutScale.swift,
 				Helpers/WatchConnectivityManager.swift,
 				Models/Category.swift,
@@ -129,9 +136,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		201978E42FACCBF200FBFEBB /* HaoTimeWatch */ = {
+			isa = PBXGroup;
+			children = (
+				201978E12FACCBF200FBFEBB /* HaoTimeWatchApp.swift */,
+				201978E22FACCBF200FBFEBB /* WatchMainView.swift */,
+				201978E32FACCBF200FBFEBB /* WatchTimerView.swift */,
+				201978F62FACD1BC00FBFEBB /* HaoTimeWatch Watch App */,
+			);
+			path = HaoTimeWatch;
+			sourceTree = "<group>";
+		};
+		201978F62FACD1BC00FBFEBB /* HaoTimeWatch Watch App */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "HaoTimeWatch Watch App";
+			sourceTree = "<group>";
+		};
 		20EBFFBD2FAA390900EB44BC = {
 			isa = PBXGroup;
 			children = (
+				201978E42FACCBF200FBFEBB /* HaoTimeWatch */,
 				20EBFFC82FAA390900EB44BC /* HaoTime */,
 				20EBFFD82FAA390B00EB44BC /* HaoTimeTests */,
 				20EBFFE22FAA390B00EB44BC /* HaoTimeUITests */,
@@ -330,6 +356,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				201978F22FACCE6900FBFEBB /* HaoTimeWatchApp.swift in Sources */,
+				201978F32FACCE6900FBFEBB /* WatchMainView.swift in Sources */,
+				201978F42FACCE6900FBFEBB /* WatchTimerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
