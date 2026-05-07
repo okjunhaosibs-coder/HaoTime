@@ -60,12 +60,10 @@ final class TimerViewModel {
         try? context.save()
         activeSession = session
         startTimer()
-        if let cat = activeSession?.category {
-            WatchConnectivityManager.shared.sendStart(
-                categoryID: cat.id.uuidString,
-                startTime: activeSession?.startTime ?? Date()
-            )
-        }
+        WatchConnectivityManager.shared.sendStart(
+            categoryID: category.id.uuidString,
+            startTime: session.startTime
+        )
     }
 
     private func startTimer() {
@@ -100,7 +98,6 @@ final class TimerViewModel {
     func handleRemoteStop(context: ModelContext) {
         guard let active = activeSession else { return }
         active.endTime = Date()
-        try? context.save()
         activeSession = nil
         timer?.invalidate()
         timer = nil
