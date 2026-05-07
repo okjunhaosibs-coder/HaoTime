@@ -13,13 +13,35 @@ struct HaoTimeApp: App {
         }
     }()
 
+    @State private var timerVM = TimerViewModel()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(timerVM)
+                .onAppear {
+                    WatchConnectivityManager.shared.activate()
+                    setupWCSHandlers()
+                }
         }
         .modelContainer(sharedModelContainer)
         #if os(macOS)
         .windowResizability(.contentMinSize)
         #endif
+    }
+
+    @MainActor
+    private func setupWCSHandlers() {
+        let context = sharedModelContainer.mainContext
+        WatchConnectivityManager.shared.onRemoteStart = { [weak timerVM] categoryID, startTime in
+            timerVM?.handleRemoteStart(
+                categoryID: categoryID,
+                startTime: startTime,
+                context: context
+            )
+        }
+        WatchConnectivityManager.shared.onRemoteStop = { [weak timerVM] in
+            timerVM?.handleRemoteStop(context: context)
+        }
     }
 }

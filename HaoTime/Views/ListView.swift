@@ -4,7 +4,7 @@ import SwiftData
 struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var dataVM = DataViewModel()
-    @State private var timerVM = TimerViewModel()
+    @Environment(TimerViewModel.self) private var timerVM
     @State private var selectedDate: Date?
     @State private var showDayDetail = false
     @State private var tappedCategory: Category?

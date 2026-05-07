@@ -4,7 +4,7 @@ import SwiftData
 struct WeekView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var dataVM = DataViewModel()
-    @State private var timerVM = TimerViewModel()
+    @Environment(TimerViewModel.self) private var timerVM
     @State private var selectedDate: Date = Date()
     @State private var weekStartDate: Date = WeekView.mondayOfWeek(containing: Date())
     @State private var tappedCategory: Category?
