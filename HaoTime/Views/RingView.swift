@@ -64,24 +64,22 @@ struct RingView: View {
 }
 
 #Preview("Ring - 3 Segments") {
-    let d: [(color: Color, duration: TimeInterval)] = [
-        (Color(hex: "#B395BD"), 7200),
-        (Color(hex: "#4ECDC4"), 5400),
-        (Color(hex: "#FF6B6B"), 3600),
-    ]
-    return RingView(categoryDurations: d, size: 200)
+    RingView(categoryDurations: [
+        (.purple, 7200),
+        (.teal, 5400),
+        (.red, 3600),
+    ], size: 200)
         .padding()
         .background(Color.black)
 }
 
 #Preview("Ring - Full >12h") {
-    let d: [(color: Color, duration: TimeInterval)] = [
-        (Color(hex: "#B395BD"), 18000),
-        (Color(hex: "#4ECDC4"), 14400),
-        (Color(hex: "#FF6B6B"), 10800),
-        (Color(hex: "#FFD93D"), 7200),
-    ]
-    return RingView(categoryDurations: d, size: 160)
+    RingView(categoryDurations: [
+        (.purple, 18000),
+        (.teal, 14400),
+        (.red, 10800),
+        (.yellow, 7200),
+    ], size: 160)
         .padding()
         .background(Color.black)
 }
