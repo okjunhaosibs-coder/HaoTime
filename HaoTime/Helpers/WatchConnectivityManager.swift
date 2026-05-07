@@ -65,7 +65,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         if let error {
             print("[WCS] Activation error: \(error.localizedDescription)")
         }
-        isReachable = session.isReachable
+        DispatchQueue.main.async { self.isReachable = session.isReachable }
     }
 
     #if os(iOS)
@@ -76,6 +76,6 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     #endif
 
     func sessionReachabilityDidChange(_ session: WCSession) {
-        isReachable = session.isReachable
+        DispatchQueue.main.async { self.isReachable = session.isReachable }
     }
 }
