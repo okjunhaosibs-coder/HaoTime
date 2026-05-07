@@ -61,7 +61,7 @@ struct WeekView: View {
         }
     }
 
-    private let visibleWeekCount = 4
+    private let visibleWeekCount = 12
 
     private var weekStrip: some View {
         ScrollView(.vertical, showsIndicators: true) {
@@ -117,6 +117,7 @@ struct WeekView: View {
     }
 
     private func refreshData() {
+        dataVM.fetchCategories(context: modelContext)
         dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: weekStartDate, context: modelContext)
     }
 

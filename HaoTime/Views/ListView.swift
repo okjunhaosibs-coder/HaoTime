@@ -105,18 +105,21 @@ struct ListView: View {
         }
     }
 
-    private let visibleWeekCount = 4
-    @State private var currentWeekIndex = 3
+    private let visibleWeekCount = 12
+    @State private var currentWeekIndex = 11
 
     private var weekCards: some View {
         TabView(selection: $currentWeekIndex) {
-            ForEach((0..<visibleWeekCount).reversed(), id: \.self) { weekOffset in
+            ForEach((0..<visibleWeekCount).reversed(), id: \.self) { displayIndex in
+                let weekOffset = visibleWeekCount - 1 - displayIndex
                 let weekStart = Calendar.current.date(byAdding: .weekOfYear, value: -weekOffset, to: weekStartDate)!
                 weekSection(starting: weekStart)
-                    .tag(weekOffset)
+                    .tag(displayIndex)
             }
         }
+        #if os(iOS)
         .tabViewStyle(.page(indexDisplayMode: .never))
+        #endif
         .frame(height: 420)
         .padding(.top, 15)
     }
@@ -180,6 +183,7 @@ struct ListView: View {
     }
 
     private func refreshData() {
+        dataVM.fetchCategories(context: modelContext)
         dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: weekStartDate, context: modelContext)
     }
 

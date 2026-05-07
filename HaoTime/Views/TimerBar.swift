@@ -9,6 +9,7 @@ struct TimerBar: View {
 
     @State private var showManualAdd = false
     @State private var showSettings = false
+    @Namespace private var animationNamespace
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     private var isCompact: Bool {
@@ -28,6 +29,9 @@ struct TimerBar: View {
             }
         }
         .onChange(of: showManualAdd) { _, showing in
+            if !showing { onDataDidChange?() }
+        }
+        .onChange(of: showSettings) { _, showing in
             if !showing { onDataDidChange?() }
         }
     }
@@ -53,25 +57,81 @@ struct TimerBar: View {
         ))
     }
 
-    // MARK: - Compact (iPhone)
+    // MARK: - Compact (iPhone) with animation
 
     private var compactLayout: some View {
         HStack(spacing: 4) {
-            categoryButtons(size: 30)
-            Spacer(minLength: 2)
-            timerStatusSection
-                .offset(x: -8)
-            menuButton
+            if timerVM.isRunning, let session = timerVM.activeSession, let cat = session.category {
+                // Timing state: icon - name - timer - stop
+                Spacer()
+
+                activeCategoryButton(cat, size: 44)
+
+                Text(cat.name)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(Color(hex: cat.colorHex))
+                    .lineLimit(1)
+                    .transition(.opacity.combined(with: .move(edge: .trailing)))
+
+                Text(timerVM.elapsedString)
+                    .font(.system(size: 15, design: .monospaced))
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color(hex: cat.colorHex))
+                    .fixedSize()
+                    .transition(.opacity.combined(with: .move(edge: .trailing)))
+
+                Button {
+                    timerVM.stop(context: modelContext)
+                } label: {
+                    HStack(spacing: 2) {
+                        Image(systemName: "stop.fill")
+                            .font(.system(size: 8))
+                        Text("停止")
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
+                .controlSize(.mini)
+                .transition(.scale.combined(with: .opacity))
+
+                Spacer()
+                menuButton
+            } else {
+                // Idle state: all category buttons
+                categoryButtons(size: 30)
+                Spacer(minLength: 2)
+                timerStatusSection
+                    .offset(x: -8)
+                menuButton
+            }
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
         .background(.ultraThinMaterial)
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: timerVM.isRunning)
         .modifier(TimerBarModifiers(
             timerVM: timerVM,
             modelContext: modelContext,
             showManualAdd: $showManualAdd,
             showSettings: $showSettings
         ))
+    }
+
+    private func activeCategoryButton(_ category: Category, size: CGFloat) -> some View {
+        Button {
+            timerVM.stop(context: modelContext)
+        } label: {
+            ZStack {
+                Circle()
+                    .fill(Color(hex: category.colorHex))
+                    .frame(width: size, height: size)
+                Image(systemName: category.iconName)
+                    .font(.system(size: size * 0.5))
+                    .foregroundStyle(.white)
+            }
+        }
+        .buttonStyle(.plain)
+        .matchedGeometryEffect(id: category.id, in: animationNamespace)
     }
 
     // MARK: - Shared Views
@@ -83,6 +143,7 @@ struct TimerBar: View {
                     category: category,
                     isActive: timerVM.activeSession?.category?.id == category.id,
                     size: size,
+                    namespace: animationNamespace,
                     action: {
                         timerVM.toggle(category: category, context: modelContext)
                     }
@@ -148,7 +209,7 @@ struct TimerBar: View {
     }
 }
 
-// MARK: - Modifiers (shared between layouts)
+// MARK: - Modifiers
 
 struct TimerBarModifiers: ViewModifier {
     @Bindable var timerVM: TimerViewModel
@@ -181,6 +242,7 @@ struct CategoryButton: View {
     let category: Category
     let isActive: Bool
     var size: CGFloat = 42
+    var namespace: Namespace.ID
     let action: () -> Void
 
     var body: some View {
@@ -196,8 +258,7 @@ struct CategoryButton: View {
             }
         }
         .buttonStyle(.plain)
-        .scaleEffect(isActive ? 1.1 : 1.0)
-        .animation(.spring(response: 0.3), value: isActive)
+        .matchedGeometryEffect(id: category.id, in: namespace)
     }
 }
 
