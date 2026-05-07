@@ -43,6 +43,7 @@ final class TimerViewModel {
         timer?.invalidate()
         timer = nil
         elapsedString = "00:00:00"
+        WatchConnectivityManager.shared.sendStop()
     }
 
     func toggle(category: Category, context: ModelContext) {
@@ -59,6 +60,12 @@ final class TimerViewModel {
         try? context.save()
         activeSession = session
         startTimer()
+        if let cat = activeSession?.category {
+            WatchConnectivityManager.shared.sendStart(
+                categoryID: cat.id.uuidString,
+                startTime: activeSession?.startTime ?? Date()
+            )
+        }
     }
 
     private func startTimer() {
@@ -76,5 +83,27 @@ final class TimerViewModel {
     func resumeFromExisting(_ session: Session) {
         activeSession = session
         startTimer()
+    }
+
+    func handleRemoteStart(categoryID: String, startTime: Date, context: ModelContext) {
+        guard activeSession == nil else { return }
+        guard let uuid = UUID(uuidString: categoryID) else { return }
+        let descriptor = FetchDescriptor<Category>(
+            predicate: #Predicate { $0.id == uuid }
+        )
+        guard let category = (try? context.fetch(descriptor))?.first else { return }
+        let session = Session(category: category, startTime: startTime)
+        activeSession = session
+        startTimer()
+    }
+
+    func handleRemoteStop(context: ModelContext) {
+        guard let active = activeSession else { return }
+        active.endTime = Date()
+        try? context.save()
+        activeSession = nil
+        timer?.invalidate()
+        timer = nil
+        elapsedString = "00:00:00"
     }
 }
