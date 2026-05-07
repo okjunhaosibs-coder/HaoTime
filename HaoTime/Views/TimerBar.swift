@@ -11,6 +11,7 @@ struct TimerBar: View {
     @State private var showSettings = false
     @Namespace private var animationNamespace
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.layoutScale) private var layoutScale
 
     private var isCompact: Bool {
         #if os(iOS)
@@ -39,15 +40,16 @@ struct TimerBar: View {
     // MARK: - Regular (Mac)
 
     private var regularLayout: some View {
-        HStack(spacing: 12) {
-            categoryButtons(size: 42)
+        let s = layoutScale
+        return HStack(spacing: 12 * s) {
+            categoryButtons(size: 42 * s)
             Spacer()
             timerStatusSection
             Spacer()
             menuButton
         }
         .padding(.horizontal)
-        .padding(.vertical, 8)
+        .padding(.vertical, 8 * s)
         .background(.ultraThinMaterial)
         .modifier(TimerBarModifiers(
             timerVM: timerVM,
@@ -60,21 +62,22 @@ struct TimerBar: View {
     // MARK: - Compact (iPhone) with animation
 
     private var compactLayout: some View {
-        HStack(spacing: 4) {
+        let s = layoutScale
+        return HStack(spacing: 4 * s) {
             if timerVM.isRunning, let session = timerVM.activeSession, let cat = session.category {
                 // Timing state: icon - name - timer - stop
                 Spacer()
 
-                activeCategoryButton(cat, size: 44)
+                activeCategoryButton(cat, size: 44 * s)
 
                 Text(cat.name)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 14 * s, weight: .medium))
                     .foregroundStyle(Color(hex: cat.colorHex))
                     .lineLimit(1)
                     .transition(.opacity.combined(with: .move(edge: .trailing)))
 
                 Text(timerVM.elapsedString)
-                    .font(.system(size: 15, design: .monospaced))
+                    .font(.system(size: 15 * s, design: .monospaced))
                     .fontWeight(.semibold)
                     .foregroundStyle(Color(hex: cat.colorHex))
                     .fixedSize()
@@ -83,9 +86,9 @@ struct TimerBar: View {
                 Button {
                     timerVM.stop(context: modelContext)
                 } label: {
-                    HStack(spacing: 2) {
+                    HStack(spacing: 2 * s) {
                         Image(systemName: "stop.fill")
-                            .font(.system(size: 8))
+                            .font(.system(size: 8 * s))
                         Text("停止")
                     }
                 }
@@ -98,16 +101,16 @@ struct TimerBar: View {
                 menuButton
             } else {
                 // Idle state: all category buttons
-                categoryButtons(size: 30)
-                Spacer(minLength: 2)
+                categoryButtons(size: 30 * s)
+                Spacer(minLength: 2 * s)
                 timerStatusSection
-                    .offset(x: -8)
+                    .offset(x: -8 * s)
                 menuButton
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .frame(height: 48)
+        .padding(.horizontal, 8 * s)
+        .padding(.vertical, 6 * s)
+        .frame(height: 48 * s)
         .background(Color.black.opacity(0.05))
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: timerVM.isRunning)
         .modifier(TimerBarModifiers(
@@ -154,27 +157,28 @@ struct TimerBar: View {
     }
 
     private var timerStatusSection: some View {
-        Group {
+        let s = layoutScale
+        return Group {
             if let session = timerVM.activeSession, let cat = session.category {
-                HStack(spacing: 3) {
+                HStack(spacing: 3 * s) {
                     Circle()
                         .fill(Color(hex: cat.colorHex))
-                        .frame(width: 5, height: 5)
+                        .frame(width: 5 * s, height: 5 * s)
                     Text(timerVM.elapsedString)
-                        .font(.system(size: isCompact ? 14 : 19, design: .monospaced))
+                        .font(.system(size: (isCompact ? 14 : 19) * s, design: .monospaced))
                         .fontWeight(.semibold)
                         .foregroundStyle(Color(hex: cat.colorHex))
                         .fixedSize()
                     Text(cat.name)
-                        .font(.system(size: 13))
+                        .font(.system(size: 13 * s))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                     Button {
                         timerVM.stop(context: modelContext)
                     } label: {
-                        HStack(spacing: 2) {
+                        HStack(spacing: 2 * s) {
                             Image(systemName: "stop.fill")
-                                .font(.system(size: 8))
+                                .font(.system(size: 8 * s))
                             Text("停止")
                         }
                     }
@@ -184,7 +188,7 @@ struct TimerBar: View {
                 }
             } else {
                 Text("点击类别开始计时")
-                    .font(.system(size: 13))
+                    .font(.system(size: 13 * s))
                     .foregroundStyle(.tertiary)
             }
         }

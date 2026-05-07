@@ -11,6 +11,8 @@ struct WeekView: View {
     @State private var showCategorySessions = false
 
     var body: some View {
+        GeometryReader { geo in
+        let scale = min(max(geo.size.width / 390, 0.85), 1.2)
         VStack(spacing: 0) {
             TimerBar(
                 categories: dataVM.activeCategories,
@@ -37,6 +39,7 @@ struct WeekView: View {
 
             weekStrip
         }
+        .environment(\.layoutScale, scale)
         .frame(minWidth: 700, minHeight: 500)
         .popover(isPresented: $showCategorySessions) {
             if let cat = tappedCategory {
@@ -58,6 +61,7 @@ struct WeekView: View {
         }
         .onChange(of: timerVM.isRunning) { _, running in
             if !running { refreshData() }
+        }
         }
     }
 

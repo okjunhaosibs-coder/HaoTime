@@ -6,8 +6,6 @@ struct DaySessionsView: View {
     let context: ModelContext
     @Environment(\.dismiss) private var dismiss
     @State private var sessions: [Session] = []
-    @State private var editingSession: Session?
-    @State private var showEditSheet = false
 
     var body: some View {
         NavigationStack {
@@ -39,21 +37,12 @@ struct DaySessionsView: View {
                             Label("删除", systemImage: "trash")
                         }
                     }
-                    .onTapGesture {
-                        editingSession = session
-                        showEditSheet = true
-                    }
                 }
             }
             .navigationTitle(formattedDate)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("完成") { dismiss() }
-                }
-            }
-            .sheet(isPresented: $showEditSheet) {
-                if let session = editingSession {
-                    SessionEditView(context: context, editingSession: session)
                 }
             }
             .onAppear {

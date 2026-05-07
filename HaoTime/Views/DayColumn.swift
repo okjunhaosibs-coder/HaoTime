@@ -8,10 +8,12 @@ struct DayColumn: View {
     let isToday: Bool
     let isFuture: Bool
     let action: () -> Void
+    @Environment(\.layoutScale) private var layoutScale
 
     var body: some View {
+        let s = layoutScale
         Button(action: action) {
-            VStack(spacing: 6) {
+            VStack(spacing: 6 * s) {
                 Text(dayOfWeek)
                     .font(.caption2)
                     .foregroundStyle(isToday ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.secondary))
@@ -21,22 +23,22 @@ struct DayColumn: View {
 
                 if isFuture {
                     Circle()
-                        .stroke(Color.gray.opacity(0.08), lineWidth: 4)
-                        .frame(width: 44, height: 44)
-                    Spacer().frame(height: CGFloat(categories.count * 5))
+                        .stroke(Color.gray.opacity(0.08), lineWidth: 4 * s)
+                        .frame(width: 44 * s, height: 44 * s)
+                    Spacer().frame(height: CGFloat(categories.count) * 5 * s)
                     Text("--")
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
-                        .frame(height: 12)
+                        .frame(height: 12 * s)
                 } else {
                     ringPreview
-                        .frame(width: 44, height: 44)
+                        .frame(width: 44 * s, height: 44 * s)
 
                     barPreview
                     totalText
                 }
             }
-            .padding(8)
+            .padding(8 * s)
             .background(isToday ? Color.accentColor.opacity(0.08) : Color.clear)
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .overlay(
@@ -50,36 +52,39 @@ struct DayColumn: View {
     }
 
     private var ringPreview: some View {
+        let s = layoutScale
         let durations = categories.compactMap { cat -> (color: Color, duration: TimeInterval)? in
             let d = dataVM.duration(for: cat.id, on: date)
             return d > 0 ? (Color(hex: cat.colorHex), d) : nil
         }
-        return RingView(categoryDurations: durations, size: 44, lineWidth: 4)
+        return RingView(categoryDurations: durations, size: 44 * s, lineWidth: 4 * s)
     }
 
     private var barPreview: some View {
-        VStack(spacing: 1) {
+        let s = layoutScale
+        return VStack(spacing: 1 * s) {
             ForEach(categories) { cat in
                 let d = dataVM.duration(for: cat.id, on: date)
                 RoundedRectangle(cornerRadius: 1)
                     .fill(d > 0 ? Color(hex: cat.colorHex) : Color.clear)
                     .frame(
-                        width: d > 0 ? max(CGFloat(d / (12 * 3600)) * 56, 4) : 0,
-                        height: 4
+                        width: d > 0 ? max(CGFloat(d / (12 * 3600)) * 56 * s, 4 * s) : 0,
+                        height: 4 * s
                     )
             }
         }
-        .frame(height: CGFloat(categories.count * 5), alignment: .leading)
+        .frame(height: CGFloat(categories.count) * 5 * s, alignment: .leading)
     }
 
     private var totalText: some View {
+        let s = layoutScale
         let total = dataVM.totalDuration(for: date)
         let h = Int(total) / 3600
         let m = (Int(total) % 3600) / 60
         return Text(total > 0 ? "\(h)h \(m)m" : "--")
-            .font(.system(size: 10))
+            .font(.system(size: 10 * s))
             .foregroundStyle(isToday ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.secondary))
-            .frame(height: 12)
+            .frame(height: 12 * s)
     }
 
     private var dayOfWeek: String {

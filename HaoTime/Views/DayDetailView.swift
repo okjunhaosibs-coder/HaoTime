@@ -7,19 +7,23 @@ struct DayDetailView: View {
     let dataVM: DataViewModel
     let ringSize: CGFloat
     let context: ModelContext
+    var centered: Bool = false
     var onCategoryTap: ((Category) -> Void)?
+    @Environment(\.layoutScale) private var layoutScale
 
     var body: some View {
-        HStack(alignment: .center, spacing: 24) {
+        let s = layoutScale
+        HStack(alignment: .center, spacing: 24 * s) {
             ringSection
             barSection
         }
-        .padding(.leading, 32)
-        .padding(.trailing)
-        .padding(.vertical, 32)
+        .frame(maxWidth: centered ? .infinity : nil)
+        .padding(.horizontal, 20 * s)
+        .padding(.vertical, 32 * s)
     }
 
     private var ringSection: some View {
+        let s = layoutScale
         let durations = categories.compactMap { cat -> (color: Color, duration: TimeInterval)? in
             let d = dataVM.duration(for: cat.id, on: date)
             return (Color(hex: cat.colorHex), d)
@@ -28,11 +32,11 @@ struct DayDetailView: View {
 
         return RingView(
             categoryDurations: durations,
-            size: ringSize
+            size: ringSize * s
         )
         .overlay {
             Text(formatTotalHours(total))
-                .font(.system(size: 15, design: .rounded))
+                .font(.system(size: 15 * s, design: .rounded))
                 .fontWeight(.semibold)
                 .foregroundColor(Color(hex: "#36494F"))
         }
