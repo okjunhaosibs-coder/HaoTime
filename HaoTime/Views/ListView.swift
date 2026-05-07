@@ -21,15 +21,19 @@ struct ListView: View {
             )
 
             ScrollView {
-                VStack(spacing: 0) {
-                    todayDetail
-
-                    Divider()
-                        .padding(.horizontal)
-
-                    weekCards
-                }
+                todayDetail
             }
+
+            Divider()
+                .padding(.horizontal)
+
+            weekCards
+
+            Text("左右滑动查看更多历史记录")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+                .padding(.top, 15)
+                .padding(.bottom, 8)
         }
         .onAppear {
             dataVM.fetchCategories(context: modelContext)
@@ -101,16 +105,46 @@ struct ListView: View {
         }
     }
 
-    private var weekCards: some View {
-        VStack(spacing: 8) {
-            Text("本周")
-                .font(.caption.weight(.medium))
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 24)
-                .padding(.top, 5)
+    private let visibleWeekCount = 4
+    @State private var currentWeekIndex = 3
 
-            ForEach(daysInWeek, id: \.self) { date in
+    private var weekCards: some View {
+        TabView(selection: $currentWeekIndex) {
+            ForEach((0..<visibleWeekCount).reversed(), id: \.self) { weekOffset in
+                let weekStart = Calendar.current.date(byAdding: .weekOfYear, value: -weekOffset, to: weekStartDate)!
+                weekSection(starting: weekStart)
+                    .tag(weekOffset)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .frame(height: 420)
+        .padding(.top, 15)
+    }
+
+    private func weekSection(starting monday: Date) -> some View {
+        let days = (0..<7).compactMap { Calendar.current.date(byAdding: .day, value: $0, to: monday) }
+        let endDate = Calendar.current.date(byAdding: .day, value: 6, to: monday)!
+        let isCurrentWeek = Calendar.current.isDate(monday, equalTo: weekStartDate, toGranularity: .weekOfYear)
+
+        return ScrollView {
+            VStack(spacing: 8) {
+                HStack {
+                    if isCurrentWeek {
+                        Circle()
+                            .fill(Color.accentColor)
+                            .frame(width: 5, height: 5)
+                        Text("本周")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.secondary)
+                    }
+                    Text(weekRangeText(start: monday, end: endDate))
+                        .font(.caption)
+                        .foregroundStyle(isCurrentWeek ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.tertiary))
+                    Spacer()
+                }
+                .padding(.horizontal, 24)
+
+                ForEach(days, id: \.self) { date in
                 if date <= Date() {
                     DayCard(
                         date: date,
@@ -128,18 +162,14 @@ struct ListView: View {
                         .padding(.horizontal)
                 }
             }
-
-            Text("上拉查看更多")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-                .padding(.vertical, 12)
+            }
         }
     }
 
-    private var daysInWeek: [Date] {
-        (0..<7).compactMap {
-            Calendar.current.date(byAdding: .day, value: $0, to: weekStartDate)
-        }
+    private func weekRangeText(start: Date, end: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "M月d日"
+        return "\(f.string(from: start)) — \(f.string(from: end))"
     }
 
     private var todayFormatted: String {
@@ -150,7 +180,7 @@ struct ListView: View {
     }
 
     private func refreshData() {
-        dataVM.aggregateForWeek(containing: weekStartDate, context: modelContext)
+        dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: weekStartDate, context: modelContext)
     }
 
     private func resumeActiveSession() {
@@ -199,7 +229,7 @@ struct DayCard: View {
                 }
                 .fixedSize(horizontal: true, vertical: false)
             }
-            .frame(width: 68)
+            .frame(width: 78)
 
             // Center: ring + right: bar + stats
             let durations = categories.compactMap { cat -> (color: Color, duration: TimeInterval)? in
@@ -277,30 +307,56 @@ struct FutureDayCard: View {
     let date: Date
 
     var body: some View {
-        HStack(spacing: 8) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(dayOfWeek)
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                Text(monthDay)
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+        HStack(alignment: .center, spacing: 10) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("今天")
+                    .font(.system(size: 9))
+                    .foregroundStyle(.clear)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 1)
+                HStack(spacing: 3) {
+                    Text(dayOfWeek)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.tertiary)
+                    Text("·")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.quaternary)
+                    Text(monthDay)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                }
+                .fixedSize(horizontal: true, vertical: false)
             }
-            .frame(width: 48, alignment: .leading)
+            .frame(width: 78)
 
-            Circle()
-                .stroke(Color.gray.opacity(0.08), lineWidth: 4)
-                .frame(width: 36, height: 36)
+            HStack(spacing: 8) {
+                Circle()
+                    .stroke(Color.gray.opacity(0.08), lineWidth: 4)
+                    .frame(width: 34, height: 34)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text("--")
-                    .font(.system(size: 10))
-                    .foregroundStyle(.tertiary)
+                HStack(spacing: 6) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(Color.clear)
+                            .frame(width: 4, height: 5)
+                    }
+                    .padding(.leading, 15)
+
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("--")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(.leading, 30)
+                }
             }
+            .padding(.leading, 20)
 
-            Spacer()
+            Spacer(minLength: 2)
         }
-        .padding(10)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
         .background(Color.gray.opacity(0.03))
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .opacity(0.4)
@@ -315,7 +371,7 @@ struct FutureDayCard: View {
 
     private var monthDay: String {
         let f = DateFormatter()
-        f.dateFormat = "M/d"
+        f.dateFormat = "M月d日"
         return f.string(from: date)
     }
 }
