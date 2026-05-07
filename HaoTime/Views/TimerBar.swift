@@ -14,7 +14,7 @@ struct TimerBar: View {
 
     private var isCompact: Bool {
         #if os(iOS)
-        horizontalSizeClass == .compact
+        true
         #else
         false
         #endif
@@ -107,7 +107,8 @@ struct TimerBar: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
-        .background(.ultraThinMaterial)
+        .frame(height: 48)
+        .background(Color.black.opacity(0.05))
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: timerVM.isRunning)
         .modifier(TimerBarModifiers(
             timerVM: timerVM,
