@@ -38,7 +38,11 @@ final class TimerViewModel {
     func stop(context: ModelContext) {
         guard let active = activeSession else { return }
         active.endTime = Date()
-        try? context.save()
+        if active.duration < 5 {
+            context.delete(active)
+        } else {
+            try? context.save()
+        }
         activeSession = nil
         timer?.invalidate()
         timer = nil

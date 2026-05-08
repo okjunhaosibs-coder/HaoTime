@@ -96,7 +96,8 @@ final class DataViewModel {
 
     func totalDuration(for date: Date) -> TimeInterval {
         let key = Self.dateFormatter.string(from: Calendar.current.startOfDay(for: date))
-        return dailyAggregates[key]?.values.reduce(0, +) ?? 0
+        let activeIDs = Set(activeCategories.map { $0.id })
+        return dailyAggregates[key]?.filter { activeIDs.contains($0.key) }.values.reduce(0, +) ?? 0
     }
 
     func duration(for categoryID: UUID, on date: Date) -> TimeInterval {
@@ -153,7 +154,7 @@ final class DataViewModel {
 
         for workout in workouts {
             let duration = workout.duration
-            guard duration > 0 else { continue }
+            guard duration >= 5 else { continue }
 
             let sessionStart = workout.startDate
             let sessionEnd = workout.endDate

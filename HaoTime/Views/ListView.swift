@@ -252,7 +252,6 @@ struct DayCard: View {
             HStack(spacing: 8 * s) {
                 RingView(categoryDurations: durations, size: 34 * s, lineWidth: 4 * s)
 
-                HStack(spacing: 6 * s) {
                 VStack(alignment: .leading, spacing: 3 * s) {
                     ForEach(categories) { cat in
                         let d = dataVM.duration(for: cat.id, on: date)
@@ -264,26 +263,26 @@ struct DayCard: View {
                     }
                 }
                 .padding(.leading, 15 * s)
-
-                let total = dataVM.totalDuration(for: date)
-                let count = categories.filter { dataVM.duration(for: $0.id, on: date) > 0 }.count
-                if total > 0 {
-                    VStack(alignment: .leading, spacing: max(1, 1 * s)) {
-                        Text(formatTotal(total))
-                            .font(.system(size: 12 * s, weight: .medium, design: .rounded))
-                            .foregroundStyle(.secondary)
-                        Text("\(count) 个类别")
-                            .font(.system(size: 9 * s))
-                            .foregroundStyle(.tertiary)
-                    }
-                    .padding(.leading, 30 * s)
-                }
-            }
-
             }
             .padding(.leading, 20 * s)
 
-            Spacer(minLength: 2 * s)
+            Spacer()
+
+            let total = dataVM.totalDuration(for: date)
+            let count = categories.filter { dataVM.duration(for: $0.id, on: date) > 0 }.count
+            if total > 0 {
+                VStack(alignment: .leading, spacing: max(1, 1 * s)) {
+                    Text(formatTotal(total))
+                        .font(.system(size: 12 * s, weight: .medium, design: .rounded))
+                        .foregroundStyle(.secondary)
+                    Text("\(count) 个类别")
+                        .font(.system(size: 9 * s))
+                        .foregroundStyle(.tertiary)
+                }
+                .offset(x: 15 * s)
+            }
+
+            Spacer().frame(width: 20 * s)
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 10 * s))
