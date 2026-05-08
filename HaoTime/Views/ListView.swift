@@ -34,7 +34,7 @@ struct ListView: View {
             Text("左右滑动查看更多历史记录")
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
-                .padding(.top, 15)
+                .padding(.top, 20)
                 .padding(.bottom, 8)
         }
         .environment(\.layoutScale, scale)
@@ -125,7 +125,7 @@ struct ListView: View {
         #if os(iOS)
         .tabViewStyle(.page(indexDisplayMode: .never))
         #endif
-        .frame(height: 420)
+        .frame(height: 430)
         .padding(.top, 15)
     }
 
@@ -190,6 +190,9 @@ struct ListView: View {
     private func refreshData() {
         dataVM.fetchCategories(context: modelContext)
         dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: Date(), context: modelContext)
+        #if os(iOS)
+        Task { await dataVM.importTodayWorkouts(context: modelContext) }
+        #endif
     }
 
     private func resumeActiveSession() {
@@ -398,5 +401,5 @@ struct FutureDayCard: View {
 #Preview("iPhone 17 Pro") {
     ListView()
         .modelContainer(PreviewHelpers.previewContainer)
-        .previewDevice("iPhone 17 Pro")
+        .environment(TimerViewModel())
 }

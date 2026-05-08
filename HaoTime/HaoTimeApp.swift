@@ -25,6 +25,7 @@ struct HaoTimeApp: App {
                 .environment(timerVM)
                 #if os(iOS)
                 .onAppear {
+                    Task { await HealthKitManager.shared.requestAuthorization() }
                     WatchConnectivityManager.shared.activate()
                     setupWCSHandlers()
                 }

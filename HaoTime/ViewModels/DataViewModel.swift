@@ -2,6 +2,9 @@ import Foundation
 import SwiftData
 import SwiftUI
 import Observation
+#if os(iOS)
+import HealthKit
+#endif
 
 @Observable
 final class DataViewModel {
@@ -134,6 +137,54 @@ final class DataViewModel {
         context.delete(session)
         try? context.save()
     }
+
+    #if os(iOS)
+    func importTodayWorkouts(context: ModelContext) async {
+        let workouts = await HealthKitManager.shared.fetchTodayWorkouts()
+        guard !workouts.isEmpty else { return }
+
+        let sportCategory = activeCategories.first(where: { $0.name == "运动" })
+            ?? createSportCategory(context: context)
+
+        let startOfDay = Calendar.current.startOfDay(for: Date())
+        let existingSessions = sessionsForDate(Date(), context: context)
+            .filter { $0.category?.id == sportCategory.id }
+
+        for workout in workouts {
+            let duration = workout.duration
+            guard duration > 0 else { continue }
+
+            let sessionStart = workout.startDate
+            let sessionEnd = workout.endDate
+            let alreadyExists = existingSessions.contains { existing in
+                abs(existing.startTime.timeIntervalSince(sessionStart)) < 60
+            }
+            guard !alreadyExists else { continue }
+
+            let session = Session(
+                category: sportCategory,
+                startTime: sessionStart,
+                endTime: sessionEnd
+            )
+            context.insert(session)
+        }
+        try? context.save()
+    }
+
+    private func createSportCategory(context: ModelContext) -> Category {
+        let maxOrder = categories.map(\.sortOrder).max() ?? -1
+        let cat = Category(
+            name: "运动",
+            colorHex: "#FF6B6B",
+            iconName: "figure.run",
+            sortOrder: maxOrder + 1
+        )
+        context.insert(cat)
+        try? context.save()
+        categories.append(cat)
+        return cat
+    }
+    #endif
 
     static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
