@@ -7,7 +7,8 @@ struct HaoTimeWatchApp: App {
         let schema = Schema([Category.self, Session.self])
         let config = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .automatic
         )
         do {
             return try ModelContainer(for: schema, configurations: [config])
@@ -23,7 +24,6 @@ struct HaoTimeWatchApp: App {
         WindowGroup {
             WatchMainView(dataVM: dataVM, timerVM: timerVM)
                 .onAppear {
-                    dataVM.fetchCategories(context: sharedModelContainer.mainContext)
                     dataVM.aggregateForWeek(containing: Date(),
                         context: sharedModelContainer.mainContext)
                     WatchConnectivityManager.shared.activate()
