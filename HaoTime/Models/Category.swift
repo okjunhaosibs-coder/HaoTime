@@ -3,18 +3,20 @@ import SwiftData
 
 @Model
 final class Category {
-    var id: UUID
-    var name: String
-    var colorHex: String
-    var iconName: String
-    var sortOrder: Int
-    var isArchived: Bool
-    var createdAt: Date
+    var id: UUID = UUID()
+    var name: String = ""
+    var colorHex: String = "#888888"
+    var iconName: String = "circle.fill"
+    var sortOrder: Int = 0
+    var isArchived: Bool = false
+    var createdAt: Date = Date()
+    @Relationship(deleteRule: .nullify, inverse: \Session.category)
+    var sessions: [Session]? = []
 
     init(
         id: UUID = UUID(),
-        name: String,
-        colorHex: String,
+        name: String = "",
+        colorHex: String = "#888888",
         iconName: String = "circle.fill",
         sortOrder: Int = 0,
         isArchived: Bool = false,

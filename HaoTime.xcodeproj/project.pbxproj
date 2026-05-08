@@ -76,6 +76,13 @@
 			);
 			target = 201978882FACC3DA00FBFEBB /* HaoTimeWatch Watch App */;
 		};
+		201979482FAD88FD00FBFEBB /* Exceptions for "HaoTime" folder in "HaoTime" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 20EBFFC52FAA390900EB44BC /* HaoTime */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -87,6 +94,7 @@
 		20EBFFC82FAA390900EB44BC /* HaoTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				201979482FAD88FD00FBFEBB /* Exceptions for "HaoTime" folder in "HaoTime" target */,
 				201978992FACC69300FBFEBB /* Exceptions for "HaoTime" folder in "HaoTimeWatch Watch App" target */,
 			);
 			path = HaoTime;
@@ -601,6 +609,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HaoTime/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -647,6 +656,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HaoTime/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

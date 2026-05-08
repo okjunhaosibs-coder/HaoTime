@@ -3,11 +3,11 @@ import SwiftData
 
 @Model
 final class Session {
-    var id: UUID
-    var category: Category?
-    var startTime: Date
-    var endTime: Date?
-    var createdAt: Date
+    var id: UUID = UUID()
+    var category: Category? = nil
+    var startTime: Date = Date()
+    var endTime: Date? = nil
+    var createdAt: Date = Date()
 
     var duration: TimeInterval {
         guard let endTime else { return Date().timeIntervalSince(startTime) }
