@@ -122,7 +122,7 @@ struct WeekView: View {
 
     private func refreshData() {
         dataVM.fetchCategories(context: modelContext)
-        dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: weekStartDate, context: modelContext)
+        dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: Date(), context: modelContext)
     }
 
     private func resumeActiveSession() {
@@ -144,5 +144,6 @@ struct WeekView: View {
 #Preview("Week View - Mac Layout") {
     WeekView()
         .modelContainer(PreviewHelpers.previewContainer)
+        .environment(TimerViewModel())
         .frame(width: 900, height: 600)
 }

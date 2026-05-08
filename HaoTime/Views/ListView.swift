@@ -110,12 +110,12 @@ struct ListView: View {
         }
     }
 
-    private let visibleWeekCount = 12
-    @State private var currentWeekIndex = 11
+    private let visibleWeekCount = 4
+    @State private var currentWeekIndex = 3
 
     private var weekCards: some View {
         TabView(selection: $currentWeekIndex) {
-            ForEach((0..<visibleWeekCount).reversed(), id: \.self) { displayIndex in
+            ForEach(0..<visibleWeekCount, id: \.self) { displayIndex in
                 let weekOffset = visibleWeekCount - 1 - displayIndex
                 let weekStart = Calendar.current.date(byAdding: .weekOfYear, value: -weekOffset, to: weekStartDate)!
                 weekSection(starting: weekStart)
@@ -189,7 +189,7 @@ struct ListView: View {
 
     private func refreshData() {
         dataVM.fetchCategories(context: modelContext)
-        dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: weekStartDate, context: modelContext)
+        dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: Date(), context: modelContext)
     }
 
     private func resumeActiveSession() {
@@ -392,7 +392,7 @@ struct FutureDayCard: View {
 #Preview("iPhone 17") {
     ListView()
         .modelContainer(PreviewHelpers.previewContainer)
-        .previewDevice("iPhone 17")
+        .environment(TimerViewModel())
 }
 
 #Preview("iPhone 17 Pro") {

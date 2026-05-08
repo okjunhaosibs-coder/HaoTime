@@ -63,14 +63,11 @@ final class DataViewModel {
     func aggregateForWeeks(weekCount: Int, endingOn date: Date, context: ModelContext) {
         dailyAggregates = [:]
         let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: date)
-        let mondayOffset = weekday == 1 ? -6 : 2 - weekday
-        guard let monday = calendar.date(byAdding: .day, value: mondayOffset, to: date) else { return }
-        let startOfMonday = calendar.startOfDay(for: monday)
+        let startOfToday = calendar.startOfDay(for: date)
         let totalDays = weekCount * 7
 
         for dayOffset in 0..<totalDays {
-            guard let dayStart = calendar.date(byAdding: .day, value: dayOffset, to: startOfMonday) else { continue }
+            guard let dayStart = calendar.date(byAdding: .day, value: -dayOffset, to: startOfToday) else { continue }
             aggregateDay(dayStart, context: context)
         }
     }

@@ -46,6 +46,16 @@ struct WatchMainView: View {
             }
         }
         .onAppear {
+            WatchConnectivityManager.shared.onRemoteStart = { [timerVM] categoryID, startTime in
+                if timerVM.isRunning {
+                    timerVM.handleRemoteStop(context: modelContext)
+                }
+                timerVM.handleRemoteStart(categoryID: categoryID, startTime: startTime, context: modelContext)
+                if let uuid = UUID(uuidString: categoryID),
+                   let cat = activeCategories.first(where: { $0.id == uuid }) {
+                    selectedCategory = cat
+                }
+            }
             WatchConnectivityManager.shared.onRemoteStop = { [timerVM] in
                 timerVM.handleRemoteStop(context: modelContext)
                 selectedCategory = nil

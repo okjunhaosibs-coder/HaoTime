@@ -15,7 +15,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "201978882FACC3DA00FBFEBB"
+               BlueprintIdentifier = "2019794E2FADB85900FBFEBB"
                BuildableName = "HaoTimeWatch Watch App.app"
                BlueprintName = "HaoTimeWatch Watch App"
                ReferencedContainer = "container:HaoTime.xcodeproj">
@@ -59,7 +59,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "201978882FACC3DA00FBFEBB"
+            BlueprintIdentifier = "2019794E2FADB85900FBFEBB"
             BuildableName = "HaoTimeWatch Watch App.app"
             BlueprintName = "HaoTimeWatch Watch App"
             ReferencedContainer = "container:HaoTime.xcodeproj">
@@ -76,7 +76,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "201978882FACC3DA00FBFEBB"
+            BlueprintIdentifier = "2019794E2FADB85900FBFEBB"
             BuildableName = "HaoTimeWatch Watch App.app"
             BlueprintName = "HaoTimeWatch Watch App"
             ReferencedContainer = "container:HaoTime.xcodeproj">
