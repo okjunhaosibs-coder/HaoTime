@@ -7,18 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		201978932FACC3DC00FBFEBB /* HaoTimeWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 201978892FACC3DA00FBFEBB /* HaoTimeWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		201978F22FACCE6900FBFEBB /* HaoTimeWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201978E12FACCBF200FBFEBB /* HaoTimeWatchApp.swift */; };
-		201978F32FACCE6900FBFEBB /* WatchMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201978E22FACCBF200FBFEBB /* WatchMainView.swift */; };
-		201978F42FACCE6900FBFEBB /* WatchTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201978E32FACCBF200FBFEBB /* WatchTimerView.swift */; };
+		201979592FADB85C00FBFEBB /* HaoTimeWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2019794F2FADB85900FBFEBB /* HaoTimeWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		201978912FACC3DC00FBFEBB /* PBXContainerItemProxy */ = {
+		201979572FADB85C00FBFEBB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 20EBFFBE2FAA390900EB44BC /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 201978882FACC3DA00FBFEBB;
+			remoteGlobalIDString = 2019794E2FADB85900FBFEBB;
 			remoteInfo = "HaoTimeWatch Watch App";
 		};
 		20EBFFD62FAA390B00EB44BC /* PBXContainerItemProxy */ = {
@@ -44,7 +41,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				201978932FACC3DC00FBFEBB /* HaoTimeWatch Watch App.app in Embed Watch Content */,
+				201979592FADB85C00FBFEBB /* HaoTimeWatch Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -52,17 +49,24 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		201978892FACC3DA00FBFEBB /* HaoTimeWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HaoTimeWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		201978E12FACCBF200FBFEBB /* HaoTimeWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HaoTimeWatchApp.swift; sourceTree = "<group>"; };
 		201978E22FACCBF200FBFEBB /* WatchMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMainView.swift; sourceTree = "<group>"; };
 		201978E32FACCBF200FBFEBB /* WatchTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTimerView.swift; sourceTree = "<group>"; };
+		2019794F2FADB85900FBFEBB /* HaoTimeWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HaoTimeWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		20EBFFC62FAA390900EB44BC /* HaoTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HaoTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		20EBFFD52FAA390B00EB44BC /* HaoTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HaoTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		20EBFFDF2FAA390B00EB44BC /* HaoTimeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HaoTimeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		201978992FACC69300FBFEBB /* Exceptions for "HaoTime" folder in "HaoTimeWatch Watch App" target */ = {
+		201979482FAD88FD00FBFEBB /* Exceptions for "HaoTime" folder in "HaoTime" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 20EBFFC52FAA390900EB44BC /* HaoTime */;
+		};
+		2019796F2FADBBAA00FBFEBB /* Exceptions for "HaoTime" folder in "HaoTimeWatch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Helpers/ColorHex.swift,
@@ -74,19 +78,12 @@
 				ViewModels/TimerViewModel.swift,
 				Views/RingView.swift,
 			);
-			target = 201978882FACC3DA00FBFEBB /* HaoTimeWatch Watch App */;
-		};
-		201979482FAD88FD00FBFEBB /* Exceptions for "HaoTime" folder in "HaoTime" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 20EBFFC52FAA390900EB44BC /* HaoTime */;
+			target = 2019794E2FADB85900FBFEBB /* HaoTimeWatch Watch App */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		2019788A2FACC3DA00FBFEBB /* HaoTimeWatch Watch App */ = {
+		201979502FADB85A00FBFEBB /* HaoTimeWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "HaoTimeWatch Watch App";
 			sourceTree = "<group>";
@@ -95,7 +92,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				201979482FAD88FD00FBFEBB /* Exceptions for "HaoTime" folder in "HaoTime" target */,
-				201978992FACC69300FBFEBB /* Exceptions for "HaoTime" folder in "HaoTimeWatch Watch App" target */,
+				2019796F2FADBBAA00FBFEBB /* Exceptions for "HaoTime" folder in "HaoTimeWatch Watch App" target */,
 			);
 			path = HaoTime;
 			sourceTree = "<group>";
@@ -113,7 +110,7 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		201978862FACC3DA00FBFEBB /* Frameworks */ = {
+		2019794C2FADB85900FBFEBB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -169,7 +166,7 @@
 				20EBFFC82FAA390900EB44BC /* HaoTime */,
 				20EBFFD82FAA390B00EB44BC /* HaoTimeTests */,
 				20EBFFE22FAA390B00EB44BC /* HaoTimeUITests */,
-				2019788A2FACC3DA00FBFEBB /* HaoTimeWatch Watch App */,
+				201979502FADB85A00FBFEBB /* HaoTimeWatch Watch App */,
 				20EBFFC72FAA390900EB44BC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -180,7 +177,7 @@
 				20EBFFC62FAA390900EB44BC /* HaoTime.app */,
 				20EBFFD52FAA390B00EB44BC /* HaoTimeTests.xctest */,
 				20EBFFDF2FAA390B00EB44BC /* HaoTimeUITests.xctest */,
-				201978892FACC3DA00FBFEBB /* HaoTimeWatch Watch App.app */,
+				2019794F2FADB85900FBFEBB /* HaoTimeWatch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -188,26 +185,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		201978882FACC3DA00FBFEBB /* HaoTimeWatch Watch App */ = {
+		2019794E2FADB85900FBFEBB /* HaoTimeWatch Watch App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 201978942FACC3DC00FBFEBB /* Build configuration list for PBXNativeTarget "HaoTimeWatch Watch App" */;
+			buildConfigurationList = 2019795A2FADB85C00FBFEBB /* Build configuration list for PBXNativeTarget "HaoTimeWatch Watch App" */;
 			buildPhases = (
-				201978852FACC3DA00FBFEBB /* Sources */,
-				201978862FACC3DA00FBFEBB /* Frameworks */,
-				201978872FACC3DA00FBFEBB /* Resources */,
+				2019794B2FADB85900FBFEBB /* Sources */,
+				2019794C2FADB85900FBFEBB /* Frameworks */,
+				2019794D2FADB85900FBFEBB /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				2019788A2FACC3DA00FBFEBB /* HaoTimeWatch Watch App */,
+				201979502FADB85A00FBFEBB /* HaoTimeWatch Watch App */,
 			);
 			name = "HaoTimeWatch Watch App";
 			packageProductDependencies = (
 			);
 			productName = "HaoTimeWatch Watch App";
-			productReference = 201978892FACC3DA00FBFEBB /* HaoTimeWatch Watch App.app */;
+			productReference = 2019794F2FADB85900FBFEBB /* HaoTimeWatch Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 		20EBFFC52FAA390900EB44BC /* HaoTime */ = {
@@ -222,7 +219,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				201978922FACC3DC00FBFEBB /* PBXTargetDependency */,
+				201979582FADB85C00FBFEBB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				20EBFFC82FAA390900EB44BC /* HaoTime */,
@@ -290,7 +287,7 @@
 				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
-					201978882FACC3DA00FBFEBB = {
+					2019794E2FADB85900FBFEBB = {
 						CreatedOnToolsVersion = 26.4.1;
 					};
 					20EBFFC52FAA390900EB44BC = {
@@ -323,13 +320,13 @@
 				20EBFFC52FAA390900EB44BC /* HaoTime */,
 				20EBFFD42FAA390B00EB44BC /* HaoTimeTests */,
 				20EBFFDE2FAA390B00EB44BC /* HaoTimeUITests */,
-				201978882FACC3DA00FBFEBB /* HaoTimeWatch Watch App */,
+				2019794E2FADB85900FBFEBB /* HaoTimeWatch Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		201978872FACC3DA00FBFEBB /* Resources */ = {
+		2019794D2FADB85900FBFEBB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -360,13 +357,10 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		201978852FACC3DA00FBFEBB /* Sources */ = {
+		2019794B2FADB85900FBFEBB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				201978F22FACCE6900FBFEBB /* HaoTimeWatchApp.swift in Sources */,
-				201978F32FACCE6900FBFEBB /* WatchMainView.swift in Sources */,
-				201978F42FACCE6900FBFEBB /* WatchTimerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,10 +388,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		201978922FACC3DC00FBFEBB /* PBXTargetDependency */ = {
+		201979582FADB85C00FBFEBB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 201978882FACC3DA00FBFEBB /* HaoTimeWatch Watch App */;
-			targetProxy = 201978912FACC3DC00FBFEBB /* PBXContainerItemProxy */;
+			target = 2019794E2FADB85900FBFEBB /* HaoTimeWatch Watch App */;
+			targetProxy = 201979572FADB85C00FBFEBB /* PBXContainerItemProxy */;
 		};
 		20EBFFD72FAA390B00EB44BC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -412,17 +406,19 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		201978952FACC3DC00FBFEBB /* Debug */ = {
+		2019795B2FADB85C00FBFEBB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "HaoTimeWatch Watch App/HaoTimeWatch Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 36UZG2YSVJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "HaoTimeWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = HaoTimeWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = Work.HaoTime;
@@ -442,21 +438,23 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
 		};
-		201978962FACC3DC00FBFEBB /* Release */ = {
+		2019795C2FADB85C00FBFEBB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "HaoTimeWatch Watch App/HaoTimeWatch Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 36UZG2YSVJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "HaoTimeWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = HaoTimeWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = Work.HaoTime;
@@ -477,7 +475,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 26.4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
 		};
@@ -623,13 +621,13 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 26.3;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Work.HaoTime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
-				SDKROOT = auto;
+				SDKROOT = macosx26.4;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -638,7 +636,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				XROS_DEPLOYMENT_TARGET = 26.4;
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
 		};
@@ -670,13 +668,13 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 26.3;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Work.HaoTime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
-				SDKROOT = auto;
+				SDKROOT = macosx26.4;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -685,7 +683,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				XROS_DEPLOYMENT_TARGET = 26.4;
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
 		};
@@ -696,8 +694,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
-				MACOSX_DEPLOYMENT_TARGET = 26.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Work.HaoTimeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -710,7 +708,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HaoTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HaoTime";
-				XROS_DEPLOYMENT_TARGET = 26.4;
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
 		};
@@ -721,8 +719,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
-				MACOSX_DEPLOYMENT_TARGET = 26.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Work.HaoTimeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -735,7 +733,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HaoTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HaoTime";
-				XROS_DEPLOYMENT_TARGET = 26.4;
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
 		};
@@ -745,8 +743,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
-				MACOSX_DEPLOYMENT_TARGET = 26.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Work.HaoTimeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -759,7 +757,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = HaoTime;
-				XROS_DEPLOYMENT_TARGET = 26.4;
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
 		};
@@ -769,8 +767,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
-				MACOSX_DEPLOYMENT_TARGET = 26.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Work.HaoTimeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -783,18 +781,18 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = HaoTime;
-				XROS_DEPLOYMENT_TARGET = 26.4;
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		201978942FACC3DC00FBFEBB /* Build configuration list for PBXNativeTarget "HaoTimeWatch Watch App" */ = {
+		2019795A2FADB85C00FBFEBB /* Build configuration list for PBXNativeTarget "HaoTimeWatch Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				201978952FACC3DC00FBFEBB /* Debug */,
-				201978962FACC3DC00FBFEBB /* Release */,
+				2019795B2FADB85C00FBFEBB /* Debug */,
+				2019795C2FADB85C00FBFEBB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

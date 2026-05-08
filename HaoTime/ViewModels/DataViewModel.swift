@@ -23,6 +23,7 @@ final class DataViewModel {
     private func createPresets(context: ModelContext) {
         for (index, preset) in Category.presets.enumerated() {
             let cat = Category(
+                id: UUID(uuidString: Category.presetIDs[index]) ?? UUID(),
                 name: preset.name,
                 colorHex: preset.colorHex,
                 iconName: preset.iconName,

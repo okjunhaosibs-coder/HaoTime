@@ -31,6 +31,13 @@ final class Category {
         self.createdAt = createdAt
     }
 
+    static let presetIDs: [String] = [
+        "B0000000-0000-0000-0000-000000000001",
+        "B0000000-0000-0000-0000-000000000002",
+        "B0000000-0000-0000-0000-000000000003",
+        "B0000000-0000-0000-0000-000000000004",
+    ]
+
     static let presets: [(name: String, colorHex: String, iconName: String)] = [
         ("写作", "#B395BD", "pencil"),
         ("思考", "#4ECDC4", "brain"),

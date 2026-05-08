@@ -30,7 +30,6 @@ struct HaoTimeWatchApp: App {
                     if existing.isEmpty {
                         for (index, preset) in Category.presets.enumerated() {
                             let cat = Category(
-                                id: UUID(uuidString: Category.presetIDs[index]) ?? UUID(),
                                 name: preset.name,
                                 colorHex: preset.colorHex,
                                 iconName: preset.iconName,
@@ -44,16 +43,6 @@ struct HaoTimeWatchApp: App {
                     dataVM.aggregateForWeek(containing: Date(),
                         context: ctx)
                     WatchConnectivityManager.shared.activate()
-                    WatchConnectivityManager.shared.onRemoteStart = { [timerVM] categoryID, startTime in
-                        if timerVM.isRunning {
-                            timerVM.handleRemoteStop(context: ctx)
-                        }
-                        timerVM.handleRemoteStart(
-                            categoryID: categoryID,
-                            startTime: startTime,
-                            context: ctx
-                        )
-                    }
                 }
         }
         .modelContainer(sharedModelContainer)
