@@ -23,10 +23,12 @@ struct HaoTimeApp: App {
         WindowGroup {
             ContentView()
                 .environment(timerVM)
+                #if os(iOS)
                 .onAppear {
                     WatchConnectivityManager.shared.activate()
                     setupWCSHandlers()
                 }
+                #endif
         }
         .modelContainer(sharedModelContainer)
         #if os(macOS)
@@ -34,6 +36,7 @@ struct HaoTimeApp: App {
         #endif
     }
 
+    #if os(iOS)
     @MainActor
     private func setupWCSHandlers() {
         let context = sharedModelContainer.mainContext
@@ -48,4 +51,5 @@ struct HaoTimeApp: App {
             timerVM?.handleRemoteStop(context: context)
         }
     }
+    #endif
 }

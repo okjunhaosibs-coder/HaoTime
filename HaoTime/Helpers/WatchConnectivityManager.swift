@@ -1,6 +1,9 @@
+#if os(iOS) || os(watchOS)
 import WatchConnectivity
+#endif
 import Foundation
 
+#if os(iOS) || os(watchOS)
 @Observable
 final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     static let shared = WatchConnectivityManager()
@@ -79,3 +82,4 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         DispatchQueue.main.async { self.isReachable = session.isReachable }
     }
 }
+#endif

@@ -43,7 +43,9 @@ final class TimerViewModel {
         timer?.invalidate()
         timer = nil
         elapsedString = "00:00:00"
+        #if os(iOS) || os(watchOS)
         WatchConnectivityManager.shared.sendStop()
+        #endif
     }
 
     func toggle(category: Category, context: ModelContext) {
@@ -60,10 +62,12 @@ final class TimerViewModel {
         try? context.save()
         activeSession = session
         startTimer()
+        #if os(iOS) || os(watchOS)
         WatchConnectivityManager.shared.sendStart(
             categoryID: category.id.uuidString,
             startTime: session.startTime
         )
+        #endif
     }
 
     private func startTimer() {
@@ -83,6 +87,7 @@ final class TimerViewModel {
         startTimer()
     }
 
+    #if os(iOS) || os(watchOS)
     func handleRemoteStart(categoryID: String, startTime: Date, context: ModelContext) {
         guard activeSession == nil else { return }
         guard let uuid = UUID(uuidString: categoryID) else { return }
@@ -103,4 +108,5 @@ final class TimerViewModel {
         timer = nil
         elapsedString = "00:00:00"
     }
+    #endif
 }
