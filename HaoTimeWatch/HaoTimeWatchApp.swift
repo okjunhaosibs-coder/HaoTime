@@ -7,8 +7,7 @@ struct HaoTimeWatchApp: App {
         let schema = Schema([Category.self, Session.self])
         let config = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false,
-            cloudKitDatabase: .automatic
+            isStoredInMemoryOnly: false
         )
         do {
             return try ModelContainer(for: schema, configurations: [config])

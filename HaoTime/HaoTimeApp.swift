@@ -5,11 +5,7 @@ import SwiftData
 struct HaoTimeApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([Category.self, Session.self])
-        let modelConfiguration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            cloudKitDatabase: .automatic
-        )
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
