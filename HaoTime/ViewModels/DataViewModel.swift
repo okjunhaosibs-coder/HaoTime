@@ -30,7 +30,8 @@ final class DataViewModel {
                 name: preset.name,
                 colorHex: preset.colorHex,
                 iconName: preset.iconName,
-                sortOrder: index
+                sortOrder: index,
+                builtInName: preset.builtInName
             )
             context.insert(cat)
         }
@@ -117,7 +118,7 @@ final class DataViewModel {
     }
 
     func archiveCategory(_ category: Category, context: ModelContext) {
-        guard activeCategories.count > 1 else { return }
+        guard category.builtInName == nil, activeCategories.count > 1 else { return }
         category.isArchived = true
         try? context.save()
         fetchCategories(context: context)
@@ -143,7 +144,7 @@ final class DataViewModel {
         let workouts = await HealthKitManager.shared.fetchTodayWorkouts()
         guard !workouts.isEmpty else { return }
 
-        let sportCategory = activeCategories.first(where: { $0.name == "运动" })
+        let sportCategory = activeCategories.first(where: { $0.builtInName == Category.sportCategoryName })
             ?? createSportCategory(context: context)
 
         let startOfDay = Calendar.current.startOfDay(for: Date())
@@ -172,12 +173,12 @@ final class DataViewModel {
     }
 
     private func createSportCategory(context: ModelContext) -> Category {
-        let maxOrder = categories.map(\.sortOrder).max() ?? -1
         let cat = Category(
             name: "运动",
             colorHex: "#FF6B6B",
             iconName: "figure.run",
-            sortOrder: maxOrder + 1
+            sortOrder: 0,
+            builtInName: Category.sportCategoryName
         )
         context.insert(cat)
         try? context.save()

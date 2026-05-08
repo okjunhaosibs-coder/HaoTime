@@ -22,9 +22,7 @@ struct ListView: View {
                 onDataDidChange: { refreshData() }
             )
 
-            ScrollView {
-                todayDetail
-            }
+            todayDetail
 
             Divider()
                 .padding(.horizontal)

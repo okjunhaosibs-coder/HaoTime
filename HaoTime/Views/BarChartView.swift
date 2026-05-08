@@ -8,7 +8,8 @@ struct BarChartView: View {
 
     var body: some View {
         let s = layoutScale
-        VStack(spacing: 10 * s) {
+        let spacing = max(2, min(10, 40 / CGFloat(items.count))) * s
+        VStack(spacing: spacing) {
             ForEach(items, id: \.name) { item in
                 HStack(spacing: 8 * s) {
                     Text(item.name)

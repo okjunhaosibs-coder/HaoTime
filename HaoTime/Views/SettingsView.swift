@@ -41,6 +41,8 @@ struct SettingsView: View {
                     }
                 }
                 .onMove { source, destination in
+                    let active = dataVM.categories.filter { !$0.isArchived }
+                    guard !source.contains(where: { active[$0].builtInName != nil }) else { return }
                     dataVM.moveCategory(from: source, to: destination, context: modelContext)
                 }
 
@@ -95,46 +97,53 @@ struct CategoryEditView: View {
         Form {
             Section("名称") {
                 TextField("类别名称", text: $category.name)
+                    .disabled(category.builtInName != nil)
             }
-            Section("颜色") {
-                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4)) {
-                    ForEach(colorOptions, id: \.self) { hex in
-                        Button {
-                            category.colorHex = hex
-                        } label: {
-                            Circle()
-                                .fill(Color(hex: hex))
-                                .frame(width: 36, height: 36)
-                                .overlay(
-                                    category.colorHex == hex ?
-                                    Circle().stroke(Color.white, lineWidth: 2) : nil
-                                )
+            if category.builtInName == nil {
+                Section("颜色") {
+                    LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4)) {
+                        ForEach(colorOptions, id: \.self) { hex in
+                            Button {
+                                category.colorHex = hex
+                            } label: {
+                                Circle()
+                                    .fill(Color(hex: hex))
+                                    .frame(width: 36, height: 36)
+                                    .overlay(
+                                        category.colorHex == hex ?
+                                        Circle().stroke(Color.white, lineWidth: 2) : nil
+                                    )
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
-            Section("图标") {
-                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 6)) {
-                    ForEach(iconOptions, id: \.self) { icon in
-                        Button {
-                            category.iconName = icon
-                        } label: {
-                            Image(systemName: icon)
-                                .font(.title3)
-                                .foregroundStyle(category.iconName == icon ? Color(hex: category.colorHex) : .secondary)
-                                .frame(width: 36, height: 36)
+            if category.builtInName == nil {
+                Section("图标") {
+                    LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 6)) {
+                        ForEach(iconOptions, id: \.self) { icon in
+                            Button {
+                                category.iconName = icon
+                            } label: {
+                                Image(systemName: icon)
+                                    .font(.title3)
+                                    .foregroundStyle(category.iconName == icon ? Color(hex: category.colorHex) : .secondary)
+                                    .frame(width: 36, height: 36)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
-            Section {
-                Button(role: .destructive) {
-                    dataVM.archiveCategory(category, context: modelContext)
-                    dismiss()
-                } label: {
-                    Text("删除类别")
+            if category.builtInName == nil {
+                Section {
+                    Button(role: .destructive) {
+                        dataVM.archiveCategory(category, context: modelContext)
+                        dismiss()
+                    } label: {
+                        Text("删除类别")
+                    }
                 }
             }
         }
