@@ -17,23 +17,37 @@ final class DataViewModel {
 
     func fetchCategories(context: ModelContext) {
         let descriptor = FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)])
-        categories = (try? context.fetch(descriptor)) ?? []
-        if categories.isEmpty {
-            createPresets(context: context)
+        var list = (try? context.fetch(descriptor)) ?? []
+        // dedup locally first
+        var seenID = Set<UUID>()
+        var seenName = Set<String>()
+        var toDelete: [Category] = []
+        for cat in list {
+            if seenID.contains(cat.id) || seenName.contains(cat.name) {
+                toDelete.append(cat)
+            } else {
+                seenID.insert(cat.id)
+                seenName.insert(cat.name)
+            }
         }
-    }
-
-    private func createPresets(context: ModelContext) {
+        for dup in toDelete {
+            context.delete(dup)
+            if let idx = list.firstIndex(where: { $0 === dup }) {
+                list.remove(at: idx)
+            }
+        }
+        if !toDelete.isEmpty { try? context.save() }
+        // ensure presets
+        let existingIDs = Set(list.map { $0.id })
         for (index, preset) in Category.presets.enumerated() {
+            let pid = UUID(uuidString: Category.presetIDs[index]) ?? UUID()
+            guard !existingIDs.contains(pid) else { continue }
             let cat = Category(
-                id: UUID(uuidString: Category.presetIDs[index]) ?? UUID(),
-                name: preset.name,
-                colorHex: preset.colorHex,
-                iconName: preset.iconName,
-                sortOrder: index,
-                builtInName: preset.builtInName
+                id: pid, name: preset.name, colorHex: preset.colorHex,
+                iconName: preset.iconName, sortOrder: index, builtInName: preset.builtInName
             )
             context.insert(cat)
+            list.append(cat)
         }
         try? context.save()
         categories = (try? context.fetch(FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)]))) ?? []
@@ -74,6 +88,15 @@ final class DataViewModel {
             guard let dayStart = calendar.date(byAdding: .day, value: -dayOffset, to: startOfToday) else { continue }
             aggregateDay(dayStart, context: context)
         }
+
+        #if os(iOS)
+        let todayKey = Self.dateFormatter.string(from: startOfToday)
+        let todayData = dailyAggregates[todayKey] ?? [:]
+        var payload: [String: TimeInterval] = [:]
+        for (uuid, dur) in todayData { payload[uuid.uuidString] = dur }
+        let total = totalDuration(for: Date())
+        WatchConnectivityManager.shared.sendRingData(durations: payload, total: total)
+        #endif
     }
 
     private func aggregateDay(_ dayStart: Date, context: ModelContext) {

@@ -43,8 +43,8 @@ struct DayDetailView: View {
     }
 
     private var barSection: some View {
-        let items = categories.map { cat -> (name: String, color: Color, duration: TimeInterval) in
-            (cat.name, Color(hex: cat.colorHex), dataVM.duration(for: cat.id, on: date))
+        let items = categories.map { cat -> (id: UUID, name: String, color: Color, duration: TimeInterval) in
+            (cat.id, cat.name, Color(hex: cat.colorHex), dataVM.duration(for: cat.id, on: date))
         }
         return BarChartView(items: items) { tappedName in
             if let cat = categories.first(where: { $0.name == tappedName }) {

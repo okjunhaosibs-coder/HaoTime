@@ -46,13 +46,6 @@ struct SettingsView: View {
                     dataVM.moveCategory(from: source, to: destination, context: modelContext)
                 }
 
-                Section {
-                    Button {
-                        navigationPath.append("new")
-                    } label: {
-                        Label("添加类别", systemImage: "plus")
-                    }
-                }
             }
             .navigationTitle("管理类别")
             .toolbar {

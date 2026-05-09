@@ -7,11 +7,8 @@ struct WatchMainView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.layoutScale) private var layoutScale
     @State private var selectedCategory: Category?
-    @Query(sort: \Category.sortOrder) private var allCategories: [Category]
-
-    private var activeCategories: [Category] {
-        allCategories.filter { !$0.isArchived }
-    }
+    @State private var ringDurations: [UUID: TimeInterval] = [:]
+    @State private var ringTotal: TimeInterval = 0
 
     var body: some View {
         let s = layoutScale
@@ -22,7 +19,7 @@ struct WatchMainView: View {
                     .offset(x: -5 * s)
 
                 VStack(alignment: .leading, spacing: max(4, 10 * s)) {
-                    ForEach(activeCategories) { cat in
+                    ForEach(dataVM.activeCategories) { cat in
                         categoryRow(cat)
                     }
                 }
@@ -39,31 +36,42 @@ struct WatchMainView: View {
                 }
             )
         }
-        .onChange(of: selectedCategory) { _, newValue in
-            if newValue == nil {
-                dataVM.aggregateForWeek(containing: Date(),
-                    context: modelContext)
-            }
-        }
         .onAppear {
+            WatchConnectivityManager.shared.onRemoteStart = { [timerVM] categoryID, startTime in
+                if timerVM.isRunning {
+                    timerVM.handleRemoteStop(context: modelContext)
+                }
+                timerVM.handleRemoteStart(categoryID: categoryID, startTime: startTime, context: modelContext)
+                if let uuid = UUID(uuidString: categoryID),
+                   let cat = dataVM.activeCategories.first(where: { $0.id == uuid }) {
+                    selectedCategory = cat
+                }
+            }
             WatchConnectivityManager.shared.onRemoteStop = { [timerVM] in
                 timerVM.handleRemoteStop(context: modelContext)
                 selectedCategory = nil
+            }
+            WatchConnectivityManager.shared.onRingData = { [self] durations, total in
+                var mapped: [UUID: TimeInterval] = [:]
+                for (key, val) in durations {
+                    if let uuid = UUID(uuidString: key) { mapped[uuid] = val }
+                }
+                ringDurations = mapped
+                ringTotal = total
             }
         }
     }
 
     private func ringSection(size: CGFloat) -> some View {
         let s = layoutScale
-        let durations = activeCategories.compactMap { cat -> (Color, TimeInterval)? in
-            let d = dataVM.duration(for: cat.id, on: Date())
+        let durations = dataVM.activeCategories.compactMap { cat -> (Color, TimeInterval)? in
+            let d = ringDurations[cat.id] ?? 0
             return d > 0 ? (Color(hex: cat.colorHex), d) : nil
         }
-        let total = dataVM.totalDuration(for: Date())
 
         return RingView(categoryDurations: durations, size: size)
             .overlay {
-                Text(formatTotal(total))
+                Text(formatTotal(ringTotal))
                     .font(.system(size: 20 * s, design: .rounded))
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)

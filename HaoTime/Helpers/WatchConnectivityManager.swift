@@ -11,6 +11,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     var isReachable = false
     var onRemoteStart: ((String, Date) -> Void)?
     var onRemoteStop: (() -> Void)?
+    var onRingData: (([String: TimeInterval], TimeInterval) -> Void)?
 
     private override init() {
         super.init()
@@ -35,13 +36,21 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         send(message: ["action": "stop"])
     }
 
+    func sendRingData(durations: [String: TimeInterval], total: TimeInterval) {
+        send(message: [
+            "action": "ringData",
+            "durations": durations,
+            "total": total
+        ])
+    }
+
     private func send(message: [String: Any]) {
-        guard WCSession.default.isReachable else {
-            print("[WCS] Not reachable")
-            return
-        }
-        WCSession.default.sendMessage(message, replyHandler: nil) { error in
-            print("[WCS] Send error: \(error.localizedDescription)")
+        if WCSession.default.isReachable {
+            WCSession.default.sendMessage(message, replyHandler: nil) { error in
+                print("[WCS] Send error: \(error.localizedDescription)")
+            }
+        } else {
+            WCSession.default.transferUserInfo(message)
         }
     }
 
@@ -54,6 +63,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
                 guard let id = message["categoryID"] as? String,
                       let startTime = message["startTime"] as? Date else { return }
                 self.onRemoteStart?(id, startTime)
+            case "ringData":
+                guard let durations = message["durations"] as? [String: TimeInterval],
+                      let total = message["total"] as? TimeInterval else { return }
+                self.onRingData?(durations, total)
             case "stop":
                 self.onRemoteStop?()
             default:

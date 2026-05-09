@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BarChartView: View {
-    let items: [(name: String, color: Color, duration: TimeInterval)]
+    let items: [(id: UUID, name: String, color: Color, duration: TimeInterval)]
     let maxHours: Double = 12.0
     var onTap: ((String) -> Void)?
     @Environment(\.layoutScale) private var layoutScale
@@ -10,7 +10,7 @@ struct BarChartView: View {
         let s = layoutScale
         let spacing = max(2, min(10, 40 / CGFloat(items.count))) * s
         VStack(spacing: spacing) {
-            ForEach(items, id: \.name) { item in
+            ForEach(items, id: \.id) { item in
                 HStack(spacing: 8 * s) {
                     Text(item.name)
                         .font(.system(size: 13 * s))
@@ -61,10 +61,10 @@ struct BarChartView: View {
 
 #Preview("Bar Chart - With Data") {
     BarChartView(items: [
-        ("写作", Color(hex: "#B395BD"), 7200),
-        ("思考", Color(hex: "#4ECDC4"), 5400),
-        ("杂事", Color(hex: "#FFD93D"), 0),
-        ("运动", Color(hex: "#FF6B6B"), 3600),
+        (UUID(), "写作", Color(hex: "#B395BD"), 7200),
+        (UUID(), "思考", Color(hex: "#4ECDC4"), 5400),
+        (UUID(), "杂事", Color(hex: "#FFD93D"), 0),
+        (UUID(), "运动", Color(hex: "#FF6B6B"), 3600),
     ])
     .frame(width: 360)
     .padding()
