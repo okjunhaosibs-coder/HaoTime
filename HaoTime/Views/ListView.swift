@@ -187,10 +187,13 @@ struct ListView: View {
 
     private func refreshData() {
         dataVM.fetchCategories(context: modelContext)
-        dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: Date(), context: modelContext)
         #if os(iOS)
-        Task { await dataVM.importTodayWorkouts(context: modelContext) }
+        Task {
+            await dataVM.importTodayWorkouts(context: modelContext)
+            dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: Date(), context: modelContext)
+        }
         #endif
+        dataVM.aggregateForWeeks(weekCount: visibleWeekCount, endingOn: Date(), context: modelContext)
     }
 
     private func resumeActiveSession() {

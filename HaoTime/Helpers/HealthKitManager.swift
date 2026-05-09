@@ -10,6 +10,7 @@ final class HealthKitManager {
 
     private let store = HKHealthStore()
     private var authorized = false
+    var onWorkoutDataChanged: (() -> Void)?
 
     private init() {}
 
@@ -23,9 +24,22 @@ final class HealthKitManager {
         do {
             try await store.requestAuthorization(toShare: [], read: typesToRead)
             authorized = true
+            startWorkoutObserver()
         } catch {
             print("[HealthKit] Auth error: \(error.localizedDescription)")
         }
+    }
+
+    private func startWorkoutObserver() {
+        let workoutType = HKObjectType.workoutType()
+        let query = HKObserverQuery(sampleType: workoutType, predicate: nil) { [weak self] _, completionHandler, error in
+            if error == nil {
+                DispatchQueue.main.async { self?.onWorkoutDataChanged?() }
+            }
+            completionHandler()
+        }
+        store.execute(query)
+        store.enableBackgroundDelivery(for: workoutType, frequency: .immediate) { _, _ in }
     }
 
     func fetchTodayWorkouts() async -> [HKWorkout] {
