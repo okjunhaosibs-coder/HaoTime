@@ -51,13 +51,23 @@ struct WatchMainView: View {
                 timerVM.handleRemoteStop(context: modelContext)
                 selectedCategory = nil
             }
-            WatchConnectivityManager.shared.onRingData = { [self] durations, total in
+            WatchConnectivityManager.shared.onRingData = { [self] durations, total, names in
                 var mapped: [UUID: TimeInterval] = [:]
                 for (key, val) in durations {
                     if let uuid = UUID(uuidString: key) { mapped[uuid] = val }
                 }
                 ringDurations = mapped
                 ringTotal = total
+                let ctx = modelContext
+                for (key, name) in names {
+                    if let uuid = UUID(uuidString: key) {
+                        let descriptor = FetchDescriptor<Category>(predicate: #Predicate { $0.id == uuid })
+                        if let cat = (try? ctx.fetch(descriptor))?.first, cat.name != name {
+                            cat.name = name
+                        }
+                    }
+                }
+                try? ctx.save()
             }
         }
     }

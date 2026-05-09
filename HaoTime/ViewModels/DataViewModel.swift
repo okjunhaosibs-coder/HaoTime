@@ -93,9 +93,15 @@ final class DataViewModel {
         let todayKey = Self.dateFormatter.string(from: startOfToday)
         let todayData = dailyAggregates[todayKey] ?? [:]
         var payload: [String: TimeInterval] = [:]
-        for (uuid, dur) in todayData { payload[uuid.uuidString] = dur }
+        var names: [String: String] = [:]
+        for (uuid, dur) in todayData {
+            payload[uuid.uuidString] = dur
+            if let cat = categories.first(where: { $0.id == uuid }) {
+                names[uuid.uuidString] = cat.name
+            }
+        }
         let total = totalDuration(for: Date())
-        WatchConnectivityManager.shared.sendRingData(durations: payload, total: total)
+        WatchConnectivityManager.shared.sendRingData(durations: payload, total: total, names: names)
         #endif
     }
 

@@ -11,7 +11,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     var isReachable = false
     var onRemoteStart: ((String, Date) -> Void)?
     var onRemoteStop: (() -> Void)?
-    var onRingData: (([String: TimeInterval], TimeInterval) -> Void)?
+    var onRingData: (([String: TimeInterval], TimeInterval, [String: String]) -> Void)?
 
     private override init() {
         super.init()
@@ -36,11 +36,12 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         send(message: ["action": "stop"])
     }
 
-    func sendRingData(durations: [String: TimeInterval], total: TimeInterval) {
+    func sendRingData(durations: [String: TimeInterval], total: TimeInterval, names: [String: String]) {
         send(message: [
             "action": "ringData",
             "durations": durations,
-            "total": total
+            "total": total,
+            "names": names
         ])
     }
 
@@ -56,6 +57,15 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
     func session(_ session: WCSession,
                  didReceiveMessage message: [String: Any]) {
+        handle(message: message)
+    }
+
+    func session(_ session: WCSession,
+                 didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        handle(message: userInfo)
+    }
+
+    private func handle(message: [String: Any]) {
         guard let action = message["action"] as? String else { return }
         DispatchQueue.main.async {
             switch action {
@@ -65,8 +75,9 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
                 self.onRemoteStart?(id, startTime)
             case "ringData":
                 guard let durations = message["durations"] as? [String: TimeInterval],
-                      let total = message["total"] as? TimeInterval else { return }
-                self.onRingData?(durations, total)
+                      let total = message["total"] as? TimeInterval,
+                      let names = message["names"] as? [String: String] else { return }
+                self.onRingData?(durations, total, names)
             case "stop":
                 self.onRemoteStop?()
             default:
