@@ -64,6 +64,7 @@ final class TimerViewModel {
         active.endTime = Date()
         if active.duration < 5 {
             context.delete(active)
+            try? context.save()
         } else {
             try? context.save()
         }
@@ -131,6 +132,10 @@ final class TimerViewModel {
     func handleRemoteStop(context: ModelContext) {
         guard let active = activeSession else { return }
         active.endTime = Date()
+        if active.duration < 5 {
+            context.delete(active)
+            try? context.save()
+        }
         activeSession = nil
         timer?.invalidate()
         timer = nil

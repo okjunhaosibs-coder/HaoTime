@@ -174,12 +174,18 @@ final class DataViewModel {
 
     func deduplicateSessions(context: ModelContext) {
         let all = (try? context.fetch(FetchDescriptor<Session>())) ?? []
-        var seen: Set<String> = []
+        var keptForTime: [String: Session] = [:]
         var toDelete: [Session] = []
         for s in all {
-            let key = "\(s.category?.id.uuidString ?? "nil")|\(Int(s.startTime.timeIntervalSince1970))|\(Int(s.endTime?.timeIntervalSince1970 ?? 0))"
-            if seen.contains(key) { toDelete.append(s) }
-            else { seen.insert(key) }
+            let key = "\(Int(s.startTime.timeIntervalSince1970))|\(Int(s.endTime?.timeIntervalSince1970 ?? 0))"
+            if let existing = keptForTime[key] {
+                // keep the one with a category, delete the nil-category one
+                if s.category == nil { toDelete.append(s) }
+                else if existing.category == nil { toDelete.append(existing); keptForTime[key] = s }
+                else { toDelete.append(s) }
+            } else {
+                keptForTime[key] = s
+            }
         }
         guard !toDelete.isEmpty else { return }
         for dup in toDelete { context.delete(dup) }

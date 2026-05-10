@@ -59,6 +59,10 @@ struct DaySessionsView: View {
             sortBy: [SortDescriptor(\.startTime, order: .reverse)]
         )
         sessions = (try? context.fetch(descriptor)) ?? []
+        print("[DIAG] DaySessionsView loaded \(sessions.count) sessions")
+        for s in sessions {
+            print("[DIAG]   id=\(s.id.uuidString) cat=\(s.category?.name ?? "nil") start=\(s.startTime.formatted(.iso8601)) end=\(s.endTime?.formatted(.iso8601) ?? "nil") dur=\(s.duration)")
+        }
     }
 
     private func deleteSession(_ session: Session) {

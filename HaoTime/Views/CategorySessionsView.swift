@@ -61,6 +61,10 @@ struct CategorySessionsView: View {
         )
         let allSessions = (try? context.fetch(descriptor)) ?? []
         sessions = allSessions.filter { $0.category?.id == category.id }
+        print("[DIAG] CategorySessionsView '\(category.name)' loaded \(sessions.count) sessions")
+        for s in sessions {
+            print("[DIAG]   id=\(s.id.uuidString) cat=\(s.category?.name ?? "nil") start=\(s.startTime.formatted(.iso8601)) end=\(s.endTime?.formatted(.iso8601) ?? "nil") dur=\(s.duration)")
+        }
     }
 
     private func deleteSession(_ session: Session) {
