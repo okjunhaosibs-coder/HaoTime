@@ -90,3 +90,7 @@ struct DaySessionsView: View {
         return f.string(from: date)
     }
 }
+
+#Preview {
+    DaySessionsView(date: Date(), context: PreviewHelpers.previewContainer.mainContext)
+}
