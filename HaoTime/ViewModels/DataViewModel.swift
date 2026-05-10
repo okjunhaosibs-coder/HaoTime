@@ -174,7 +174,8 @@ final class DataViewModel {
         let workouts = await HealthKitManager.shared.fetchTodayWorkouts()
         guard !workouts.isEmpty else { return }
 
-        let sportCategory = activeCategories.first(where: { $0.builtInName == Category.sportCategoryName })
+        let allCats = (try? context.fetch(FetchDescriptor<Category>())) ?? []
+        let sportCategory = allCats.first(where: { $0.builtInName == Category.sportCategoryName })
             ?? createSportCategory(context: context)
 
         let startOfDay = Calendar.current.startOfDay(for: Date())
@@ -203,7 +204,9 @@ final class DataViewModel {
     }
 
     private func createSportCategory(context: ModelContext) -> Category {
+        let pid = UUID(uuidString: Category.presetIDs[0]) ?? UUID()
         let cat = Category(
+            id: pid,
             name: "运动",
             colorHex: "#FF6B6B",
             iconName: "figure.run",

@@ -93,7 +93,7 @@ final class TimerViewModel {
 
     #if os(iOS) || os(watchOS)
     func handleRemoteStart(categoryID: String, startTime: Date, context: ModelContext) {
-        guard activeSession == nil else { return }
+        if activeSession != nil { handleRemoteStop(context: context) }
         guard let uuid = UUID(uuidString: categoryID) else { return }
         let descriptor = FetchDescriptor<Category>(
             predicate: #Predicate { $0.id == uuid }
