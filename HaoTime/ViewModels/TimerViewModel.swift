@@ -10,14 +10,13 @@ final class TimerViewModel {
     var pendingCategory: Category?
 
     private var timer: Timer?
-    private var remoteStartTime: Date?  // non-persisted: remote timer display only
     #if os(macOS)
     private var suspendedCategory: Category?
     private var sleepObserver: NSObjectProtocol?
     private var wakeObserver: NSObjectProtocol?
     #endif
 
-    var isRunning: Bool { activeSession != nil || remoteStartTime != nil }
+    var isRunning: Bool { activeSession != nil }
 
     #if os(macOS)
     func setupSleepWakeHandlers(context: ModelContext) {
@@ -102,15 +101,8 @@ final class TimerViewModel {
     private func startTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            let elapsed: TimeInterval
-            if let session = self.activeSession {
-                elapsed = session.duration
-            } else if let remoteStart = self.remoteStartTime {
-                elapsed = Date().timeIntervalSince(remoteStart)
-            } else {
-                return
-            }
+            guard let self, let session = self.activeSession else { return }
+            let elapsed = session.duration
             let h = Int(elapsed) / 3600
             let m = (Int(elapsed) % 3600) / 60
             let s = Int(elapsed) % 60
@@ -126,14 +118,19 @@ final class TimerViewModel {
     #if os(iOS) || os(watchOS)
     func handleRemoteStart(categoryID: String, startTime: Date, context: ModelContext) {
         if activeSession != nil { handleRemoteStop(context: context) }
-        if remoteStartTime != nil { remoteStartTime = nil }
-        remoteStartTime = startTime
+        guard let uuid = UUID(uuidString: categoryID) else { return }
+        let descriptor = FetchDescriptor<Category>(
+            predicate: #Predicate { $0.id == uuid }
+        )
+        guard let category = (try? context.fetch(descriptor))?.first else { return }
+        let session = Session(category: category, startTime: startTime)
+        activeSession = session
         startTimer()
     }
 
     func handleRemoteStop(context: ModelContext) {
-        remoteStartTime = nil
-        activeSession?.endTime = Date()
+        guard let active = activeSession else { return }
+        active.endTime = Date()
         activeSession = nil
         timer?.invalidate()
         timer = nil

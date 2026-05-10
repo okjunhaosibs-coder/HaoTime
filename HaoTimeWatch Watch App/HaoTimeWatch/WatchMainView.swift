@@ -51,6 +51,7 @@ struct WatchMainView: View {
                 timerVM.handleRemoteStop(context: modelContext)
                 selectedCategory = nil
             }
+            WatchConnectivityManager.shared.activate()
             WatchConnectivityManager.shared.onRingData = { [self] durations, total, names in
                 var mapped: [UUID: TimeInterval] = [:]
                 for (key, val) in durations {

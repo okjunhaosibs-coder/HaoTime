@@ -26,7 +26,6 @@ struct HaoTimeWatchApp: App {
                     let ctx = sharedModelContainer.mainContext
                     dataVM.fetchCategories(context: ctx)
                     dataVM.aggregateForWeek(containing: Date(), context: ctx)
-                    WatchConnectivityManager.shared.activate()
                 }
         }
         .modelContainer(sharedModelContainer)
