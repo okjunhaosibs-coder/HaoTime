@@ -29,11 +29,14 @@ struct HaoTimeApp: App {
                     HealthKitManager.shared.onWorkoutDataChanged = {
                         let ctx = sharedModelContainer.mainContext
                         Task {
-                            await DataViewModel().importTodayWorkouts(context: ctx)
+                            let vm = DataViewModel()
+                            vm.fetchCategories(context: ctx)
+                            await vm.importTodayWorkouts(context: ctx)
+                            vm.aggregateForWeeks(weekCount: 4, endingOn: Date(), context: ctx)
                         }
                     }
-                    WatchConnectivityManager.shared.activate()
                     setupWCSHandlers()
+                    WatchConnectivityManager.shared.activate()
                 }
                 #endif
         }

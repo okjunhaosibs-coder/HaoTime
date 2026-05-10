@@ -54,6 +54,9 @@ struct WeekView: View {
             dataVM.fetchCategories(context: modelContext)
             refreshData()
             resumeActiveSession()
+            #if os(macOS)
+            timerVM.setupSleepWakeHandlers(context: modelContext)
+            #endif
         }
         .onChange(of: weekStartDate) { _, _ in refreshData() }
         .onChange(of: showCategorySessions) { _, newValue in

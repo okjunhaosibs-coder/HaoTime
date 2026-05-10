@@ -18,25 +18,26 @@ final class DataViewModel {
     func fetchCategories(context: ModelContext) {
         let descriptor = FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)])
         var list = (try? context.fetch(descriptor)) ?? []
-        // dedup locally first
-        var seenID = Set<UUID>()
-        var seenName = Set<String>()
+        var didChange = false
+        // dedup: keep first per UUID+name, migrate sessions before deleting duplicates
+        var keptForName: [String: Category] = [:]
         var toDelete: [Category] = []
         for cat in list {
-            if seenID.contains(cat.id) || seenName.contains(cat.name) {
+            if let keeper = keptForName[cat.name] {
+                // migrate sessions from duplicate to keeper before deleting
+                if let sessions = cat.sessions {
+                    for s in sessions { s.category = keeper }
+                }
                 toDelete.append(cat)
             } else {
-                seenID.insert(cat.id)
-                seenName.insert(cat.name)
+                keptForName[cat.name] = cat
             }
         }
         for dup in toDelete {
             context.delete(dup)
-            if let idx = list.firstIndex(where: { $0 === dup }) {
-                list.remove(at: idx)
-            }
+            if let idx = list.firstIndex(where: { $0 === dup }) { list.remove(at: idx) }
+            didChange = true
         }
-        if !toDelete.isEmpty { try? context.save() }
         // ensure presets
         let existingIDs = Set(list.map { $0.id })
         for (index, preset) in Category.presets.enumerated() {
@@ -47,9 +48,9 @@ final class DataViewModel {
                 iconName: preset.iconName, sortOrder: index, builtInName: preset.builtInName
             )
             context.insert(cat)
-            list.append(cat)
+            didChange = true
         }
-        try? context.save()
+        if didChange { try? context.save() }
         categories = (try? context.fetch(FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)]))) ?? []
     }
 
@@ -93,12 +94,12 @@ final class DataViewModel {
         let todayKey = Self.dateFormatter.string(from: startOfToday)
         let todayData = dailyAggregates[todayKey] ?? [:]
         var payload: [String: TimeInterval] = [:]
-        var names: [String: String] = [:]
         for (uuid, dur) in todayData {
             payload[uuid.uuidString] = dur
-            if let cat = categories.first(where: { $0.id == uuid }) {
-                names[uuid.uuidString] = cat.name
-            }
+        }
+        var names: [String: String] = [:]
+        for cat in activeCategories {
+            names[cat.id.uuidString] = cat.name
         }
         let total = totalDuration(for: Date())
         WatchConnectivityManager.shared.sendRingData(durations: payload, total: total, names: names)
@@ -145,6 +146,9 @@ final class DataViewModel {
     func updateCategory(_ category: Category, context: ModelContext) {
         try? context.save()
         fetchCategories(context: context)
+        #if os(iOS)
+        aggregateForWeeks(weekCount: 4, endingOn: Date(), context: context)
+        #endif
     }
 
     func archiveCategory(_ category: Category, context: ModelContext) {
@@ -172,7 +176,7 @@ final class DataViewModel {
     #if os(iOS)
     func importTodayWorkouts(context: ModelContext) async {
         let workouts = await HealthKitManager.shared.fetchTodayWorkouts()
-        guard !workouts.isEmpty else { return }
+                guard !workouts.isEmpty else { return }
 
         let allCats = (try? context.fetch(FetchDescriptor<Category>())) ?? []
         let sportCategory = allCats.first(where: { $0.builtInName == Category.sportCategoryName })

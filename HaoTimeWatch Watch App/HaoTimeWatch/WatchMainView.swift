@@ -68,6 +68,7 @@ struct WatchMainView: View {
                     }
                 }
                 try? ctx.save()
+                dataVM.fetchCategories(context: ctx)
             }
         }
     }
