@@ -262,7 +262,7 @@ struct DayCard: View {
                         if d > 0 {
                             RoundedRectangle(cornerRadius: 2)
                                 .fill(Color(hex: cat.colorHex))
-                                .frame(width: max(CGFloat(d / (12 * 3600)) * 120 * s, 3 * s), height: 5 * s)
+                                .frame(width: min(120 * s, max(CGFloat(d / (6 * 3600)) * 120 * s, 3 * s)), height: 5 * s)
                         }
                     }
                 }
@@ -286,7 +286,7 @@ struct DayCard: View {
                 .offset(x: 15 * s)
             }
 
-            Spacer().frame(width: 20 * s)
+            Spacer().frame(width: 15 * s)
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 10 * s))

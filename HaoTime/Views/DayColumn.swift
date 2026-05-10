@@ -68,7 +68,7 @@ struct DayColumn: View {
                 RoundedRectangle(cornerRadius: 1)
                     .fill(d > 0 ? Color(hex: cat.colorHex) : Color.clear)
                     .frame(
-                        width: d > 0 ? max(CGFloat(d / (12 * 3600)) * 56 * s, 4 * s) : 0,
+                        width: d > 0 ? min(56 * s, max(CGFloat(d / (6 * 3600)) * 56 * s, 4 * s)) : 0,
                         height: 4 * s
                     )
             }

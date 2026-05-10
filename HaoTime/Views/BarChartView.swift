@@ -2,7 +2,7 @@ import SwiftUI
 
 struct BarChartView: View {
     let items: [(id: UUID, name: String, color: Color, duration: TimeInterval)]
-    let maxHours: Double = 12.0
+    let maxHours: Double = 6.0
     var onTap: ((String) -> Void)?
     @Environment(\.layoutScale) private var layoutScale
 
@@ -26,7 +26,7 @@ struct BarChartView: View {
                                 RoundedRectangle(cornerRadius: 4)
                                     .fill(item.color)
                                     .frame(
-                                        width: max(CGFloat(item.duration / (maxHours * 3600)) * geo.size.width, 4 * s),
+                                        width: min(geo.size.width, max(CGFloat(item.duration / (maxHours * 3600)) * geo.size.width, 4 * s)),
                                         height: 22 * s
                                     )
                             }
