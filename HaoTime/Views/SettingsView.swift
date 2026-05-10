@@ -129,16 +129,6 @@ struct CategoryEditView: View {
                     }
                 }
             }
-            if category.builtInName == nil {
-                Section {
-                    Button(role: .destructive) {
-                        dataVM.archiveCategory(category, context: modelContext)
-                        dismiss()
-                    } label: {
-                        Text("删除类别")
-                    }
-                }
-            }
         }
         .navigationTitle("编辑类别")
         .toolbar {

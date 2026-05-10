@@ -26,15 +26,6 @@ struct HaoTimeApp: App {
                 #if os(iOS)
                 .onAppear {
                     Task { await HealthKitManager.shared.requestAuthorization() }
-                    HealthKitManager.shared.onWorkoutDataChanged = {
-                        let ctx = sharedModelContainer.mainContext
-                        Task {
-                            let vm = DataViewModel()
-                            vm.fetchCategories(context: ctx)
-                            await vm.importTodayWorkouts(context: ctx)
-                            vm.aggregateForWeeks(weekCount: 4, endingOn: Date(), context: ctx)
-                        }
-                    }
                     setupWCSHandlers()
                     WatchConnectivityManager.shared.activate()
                 }

@@ -24,10 +24,9 @@ final class DataViewModel {
         var toDelete: [Category] = []
         for cat in list {
             if let keeper = keptForName[cat.name] {
-                // migrate sessions from duplicate to keeper before deleting
-                if let sessions = cat.sessions {
-                    for s in sessions { s.category = keeper }
-                }
+                // migrate sessions from DB before deleting duplicate category
+                let allSessions = (try? context.fetch(FetchDescriptor<Session>())) ?? []
+                for s in allSessions where s.category?.id == cat.id { s.category = keeper }
                 toDelete.append(cat)
             } else {
                 keptForName[cat.name] = cat
@@ -170,6 +169,20 @@ final class DataViewModel {
 
     func deleteSession(_ session: Session, context: ModelContext) {
         context.delete(session)
+        try? context.save()
+    }
+
+    func deduplicateSessions(context: ModelContext) {
+        let all = (try? context.fetch(FetchDescriptor<Session>())) ?? []
+        var seen: Set<String> = []
+        var toDelete: [Session] = []
+        for s in all {
+            let key = "\(s.category?.id.uuidString ?? "nil")|\(Int(s.startTime.timeIntervalSince1970))|\(Int(s.endTime?.timeIntervalSince1970 ?? 0))"
+            if seen.contains(key) { toDelete.append(s) }
+            else { seen.insert(key) }
+        }
+        guard !toDelete.isEmpty else { return }
+        for dup in toDelete { context.delete(dup) }
         try? context.save()
     }
 
