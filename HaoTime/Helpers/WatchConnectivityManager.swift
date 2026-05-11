@@ -11,7 +11,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     var isReachable = false
     var onRemoteStart: ((String, Date) -> Void)?
     var onRemoteStop: (() -> Void)?
-    var onRingData: (([String: TimeInterval], TimeInterval, [String: String]) -> Void)?
+    var onRingData: (([String: TimeInterval], TimeInterval, [String: String], [String: String], [String: String]) -> Void)?
 
     private override init() {
         super.init()
@@ -36,12 +36,14 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         send(message: ["action": "stop"])
     }
 
-    func sendRingData(durations: [String: TimeInterval], total: TimeInterval, names: [String: String]) {
+    func sendRingData(durations: [String: TimeInterval], total: TimeInterval, names: [String: String], icons: [String: String], colors: [String: String]) {
         send(message: [
             "action": "ringData",
             "durations": durations,
             "total": total,
-            "names": names
+            "names": names,
+            "icons": icons,
+            "colors": colors
         ])
     }
 
@@ -76,8 +78,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             case "ringData":
                 guard let durations = message["durations"] as? [String: TimeInterval],
                       let total = message["total"] as? TimeInterval,
-                      let names = message["names"] as? [String: String] else { return }
-                self.onRingData?(durations, total, names)
+                      let names = message["names"] as? [String: String],
+                      let icons = message["icons"] as? [String: String],
+                      let colors = message["colors"] as? [String: String] else { return }
+                self.onRingData?(durations, total, names, icons, colors)
             case "stop":
                 self.onRemoteStop?()
             default:

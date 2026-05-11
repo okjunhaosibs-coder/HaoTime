@@ -97,11 +97,15 @@ final class DataViewModel {
             payload[uuid.uuidString] = dur
         }
         var names: [String: String] = [:]
+        var icons: [String: String] = [:]
+        var colors: [String: String] = [:]
         for cat in activeCategories {
             names[cat.id.uuidString] = cat.name
+            icons[cat.id.uuidString] = cat.iconName
+            colors[cat.id.uuidString] = cat.colorHex
         }
         let total = totalDuration(for: Date())
-        WatchConnectivityManager.shared.sendRingData(durations: payload, total: total, names: names)
+        WatchConnectivityManager.shared.sendRingData(durations: payload, total: total, names: names, icons: icons, colors: colors)
         #endif
     }
 
@@ -177,7 +181,7 @@ final class DataViewModel {
         var keptForTime: [String: Session] = [:]
         var toDelete: [Session] = []
         for s in all {
-            let key = "\(Int(s.startTime.timeIntervalSince1970))|\(Int(s.endTime?.timeIntervalSince1970 ?? 0))"
+            let key = "\(Int(s.startTime.timeIntervalSince1970 / 2))|\(Int((s.endTime?.timeIntervalSince1970 ?? 0) / 2))"
             if let existing = keptForTime[key] {
                 // keep the one with a category, delete the nil-category one
                 if s.category == nil { toDelete.append(s) }

@@ -52,7 +52,7 @@ struct WatchMainView: View {
                 selectedCategory = nil
             }
             WatchConnectivityManager.shared.activate()
-            WatchConnectivityManager.shared.onRingData = { [self] durations, total, names in
+            WatchConnectivityManager.shared.onRingData = { [self] durations, total, names, icons, colors in
                 var mapped: [UUID: TimeInterval] = [:]
                 for (key, val) in durations {
                     if let uuid = UUID(uuidString: key) { mapped[uuid] = val }
@@ -63,8 +63,10 @@ struct WatchMainView: View {
                 for (key, name) in names {
                     if let uuid = UUID(uuidString: key) {
                         let descriptor = FetchDescriptor<Category>(predicate: #Predicate { $0.id == uuid })
-                        if let cat = (try? ctx.fetch(descriptor))?.first, cat.name != name {
-                            cat.name = name
+                        if let cat = (try? ctx.fetch(descriptor))?.first {
+                            if cat.name != name { cat.name = name }
+                            if let icon = icons[key], cat.iconName != icon { cat.iconName = icon }
+                            if let color = colors[key], cat.colorHex != color { cat.colorHex = color }
                         }
                     }
                 }
