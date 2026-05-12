@@ -16,6 +16,10 @@ final class DataViewModel {
     var dailyAggregates: [String: [UUID: TimeInterval]] = [:]
 
     func fetchCategories(context: ModelContext) {
+        // Clean up orphaned nil-category sessions
+        let allSessions = (try? context.fetch(FetchDescriptor<Session>())) ?? []
+        for s in allSessions where s.category == nil { context.delete(s) }
+        if allSessions.contains(where: { $0.category == nil }) { try? context.save() }
         let descriptor = FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)])
         var list = (try? context.fetch(descriptor)) ?? []
         var didChange = false
@@ -49,7 +53,6 @@ final class DataViewModel {
             context.insert(cat)
             didChange = true
         }
-        if didChange { try? context.save() }
         categories = (try? context.fetch(FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)]))) ?? []
     }
 
@@ -177,7 +180,11 @@ final class DataViewModel {
     }
 
     func deduplicateSessions(context: ModelContext) {
-        let all = (try? context.fetch(FetchDescriptor<Session>())) ?? []
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: Date())
+        let dayEnd = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+        let predicate = #Predicate<Session> { $0.startTime >= startOfDay && $0.startTime < dayEnd }
+        let all = (try? context.fetch(FetchDescriptor<Session>(predicate: predicate))) ?? []
         var keptForTime: [String: Session] = [:]
         var toDelete: [Session] = []
         for s in all {
@@ -227,7 +234,6 @@ final class DataViewModel {
             )
             context.insert(session)
         }
-        try? context.save()
     }
 
     private func createSportCategory(context: ModelContext) -> Category {

@@ -50,7 +50,6 @@ struct HaoTimeApp: App {
         }
         WatchConnectivityManager.shared.onRemoteStop = { [weak timerVM] in
             timerVM?.handleRemoteStop(context: context)
-            DataViewModel().deduplicateSessions(context: context)
         }
     }
     #endif

@@ -99,6 +99,47 @@ struct TimerBar: View {
 
                 Spacer()
                 menuButton
+            } else if timerVM.isRunning, let name = timerVM.remoteCategoryName {
+                let color = Color(hex: timerVM.remoteCategoryColor ?? "#888888")
+                Spacer()
+
+                ZStack {
+                    Circle()
+                        .fill(color)
+                        .frame(width: 44 * s, height: 44 * s)
+                    Image(systemName: timerVM.remoteCategoryIcon ?? "circle.fill")
+                        .font(.system(size: (44 * s) * 0.5))
+                        .foregroundStyle(.white)
+                }
+
+                Text(name)
+                    .font(.system(size: 14 * s, weight: .medium))
+                    .foregroundStyle(color)
+                    .lineLimit(1)
+
+                Text(timerVM.elapsedString)
+                    .font(.system(size: 15 * s, design: .monospaced))
+                    .fontWeight(.semibold)
+                    .foregroundStyle(color)
+                    .fixedSize()
+                    .transition(.opacity.combined(with: .move(edge: .trailing)))
+
+                Button {
+                    timerVM.stop(context: modelContext)
+                } label: {
+                    HStack(spacing: 2 * s) {
+                        Image(systemName: "stop.fill")
+                            .font(.system(size: 8 * s))
+                        Text("停止")
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
+                .controlSize(.mini)
+                .transition(.scale.combined(with: .opacity))
+
+                Spacer()
+                menuButton
             } else {
                 // Idle state: all category buttons
                 categoryButtons(size: 30 * s)

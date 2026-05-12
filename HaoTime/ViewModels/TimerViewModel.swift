@@ -10,13 +10,17 @@ final class TimerViewModel {
     var pendingCategory: Category?
 
     private var timer: Timer?
+    private var remoteStartTime: Date?
+    var remoteCategoryName: String? = nil
+    var remoteCategoryColor: String? = nil
+    var remoteCategoryIcon: String? = nil
     #if os(macOS)
     private var suspendedCategory: Category?
     private var sleepObserver: NSObjectProtocol?
     private var wakeObserver: NSObjectProtocol?
     #endif
 
-    var isRunning: Bool { activeSession != nil }
+    var isRunning: Bool { activeSession != nil || remoteStartTime != nil }
 
     #if os(macOS)
     func setupSleepWakeHandlers(context: ModelContext) {
@@ -60,6 +64,17 @@ final class TimerViewModel {
     }
 
     func stop(context: ModelContext) {
+        guard isRunning else { return }
+        if remoteStartTime != nil {
+            remoteStartTime = nil
+            timer?.invalidate()
+            timer = nil
+            elapsedString = "00:00:00"
+            #if os(iOS) || os(watchOS)
+            WatchConnectivityManager.shared.sendStop()
+            #endif
+            return
+        }
         guard let active = activeSession else { return }
         active.endTime = Date()
         if active.duration < 5 {
@@ -102,8 +117,15 @@ final class TimerViewModel {
     private func startTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self, let session = self.activeSession else { return }
-            let elapsed = session.duration
+            guard let self else { return }
+            let elapsed: TimeInterval
+            if let session = self.activeSession {
+                elapsed = session.duration
+            } else if let remoteStart = self.remoteStartTime {
+                elapsed = Date().timeIntervalSince(remoteStart)
+            } else {
+                return
+            }
             let h = Int(elapsed) / 3600
             let m = (Int(elapsed) % 3600) / 60
             let s = Int(elapsed) % 60
@@ -118,24 +140,25 @@ final class TimerViewModel {
 
     #if os(iOS) || os(watchOS)
     func handleRemoteStart(categoryID: String, startTime: Date, context: ModelContext) {
-        if activeSession != nil { handleRemoteStop(context: context) }
-        guard let uuid = UUID(uuidString: categoryID) else { return }
-        let descriptor = FetchDescriptor<Category>(
-            predicate: #Predicate { $0.id == uuid }
-        )
-        guard let category = (try? context.fetch(descriptor))?.first else { return }
-        let session = Session(category: category, startTime: startTime)
-        activeSession = session
+        if isRunning { handleRemoteStop(context: context) }
+        remoteStartTime = startTime
+        if let uuid = UUID(uuidString: categoryID) {
+            let descriptor = FetchDescriptor<Category>(predicate: #Predicate { $0.id == uuid })
+            if let cat = (try? context.fetch(descriptor))?.first {
+                remoteCategoryName = cat.name
+                remoteCategoryColor = cat.colorHex
+                remoteCategoryIcon = cat.iconName
+            }
+        }
         startTimer()
     }
 
     func handleRemoteStop(context: ModelContext) {
-        guard let active = activeSession else { return }
-        active.endTime = Date()
-        if active.duration < 5 {
-            context.delete(active)
-            try? context.save()
-        }
+        remoteStartTime = nil
+        remoteCategoryName = nil
+        remoteCategoryColor = nil
+        remoteCategoryIcon = nil
+        if let active = activeSession { active.endTime = Date() }
         activeSession = nil
         timer?.invalidate()
         timer = nil
