@@ -187,6 +187,7 @@ struct ListView: View {
 
     private func refreshData() {
         dataVM.fetchCategories(context: modelContext)
+        dataVM.deduplicateSessions(context: modelContext)
         try? modelContext.save()
         #if os(iOS)
         Task {

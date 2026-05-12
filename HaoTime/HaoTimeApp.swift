@@ -57,8 +57,8 @@ struct HaoTimeApp: App {
                 context: context
             )
         }
-        WatchConnectivityManager.shared.onRemoteStop = { [weak timerVM] in
-            timerVM?.handleRemoteStop(context: context)
+        WatchConnectivityManager.shared.onRemoteStop = { [weak timerVM] categoryID, startTime, endTime in
+            timerVM?.handleRemoteStop(categoryID: categoryID, startTime: startTime, endTime: endTime, context: context)
         }
     }
     #endif

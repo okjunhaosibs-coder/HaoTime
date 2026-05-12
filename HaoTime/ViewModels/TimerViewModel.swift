@@ -11,6 +11,7 @@ final class TimerViewModel {
 
     private var timer: Timer?
     private var remoteStartTime: Date?
+    private var remoteCategoryID: String?
     var remoteCategoryName: String? = nil
     var remoteCategoryColor: String? = nil
     var remoteCategoryIcon: String? = nil
@@ -66,12 +67,16 @@ final class TimerViewModel {
     func stop(context: ModelContext) {
         guard isRunning else { return }
         if remoteStartTime != nil {
+            let start = remoteStartTime!
+            let cid = remoteCategoryID ?? ""
+            let end = Date()
             remoteStartTime = nil
+            remoteCategoryName = nil; remoteCategoryColor = nil; remoteCategoryIcon = nil; remoteCategoryID = nil
             timer?.invalidate()
             timer = nil
             elapsedString = "00:00:00"
             #if os(iOS) || os(watchOS)
-            WatchConnectivityManager.shared.sendStop()
+            WatchConnectivityManager.shared.sendStop(categoryID: cid, startTime: start, endTime: end)
             #endif
             return
         }
@@ -88,7 +93,10 @@ final class TimerViewModel {
         timer = nil
         elapsedString = "00:00:00"
         #if os(iOS) || os(watchOS)
-        WatchConnectivityManager.shared.sendStop()
+        let cid = active.category?.id.uuidString ?? ""
+        let st = active.startTime
+        let et = active.endTime ?? Date()
+        WatchConnectivityManager.shared.sendStop(categoryID: cid, startTime: st, endTime: et)
         #endif
     }
 
@@ -140,8 +148,9 @@ final class TimerViewModel {
 
     #if os(iOS) || os(watchOS)
     func handleRemoteStart(categoryID: String, startTime: Date, context: ModelContext) {
-        if isRunning { handleRemoteStop(context: context) }
+        if isRunning { handleRemoteStop(categoryID: "", startTime: Date(), endTime: Date(), context: context) }
         remoteStartTime = startTime
+        remoteCategoryID = categoryID
         if let uuid = UUID(uuidString: categoryID) {
             let descriptor = FetchDescriptor<Category>(predicate: #Predicate { $0.id == uuid })
             if let cat = (try? context.fetch(descriptor))?.first {
@@ -153,12 +162,28 @@ final class TimerViewModel {
         startTimer()
     }
 
-    func handleRemoteStop(context: ModelContext) {
+    func handleRemoteStop(categoryID: String, startTime: Date, endTime: Date, context: ModelContext) {
         remoteStartTime = nil
-        remoteCategoryName = nil
-        remoteCategoryColor = nil
-        remoteCategoryIcon = nil
-        if let active = activeSession { active.endTime = Date() }
+        remoteCategoryName = nil; remoteCategoryColor = nil; remoteCategoryIcon = nil; remoteCategoryID = nil
+        // Originator: close own session and send real data back
+        if activeSession != nil {
+            stop(context: context)
+            return
+        }
+        // Receiver: persist the remote session data (dedup by startTime)
+        if !categoryID.isEmpty, endTime.timeIntervalSince(startTime) >= 5,
+           let uuid = UUID(uuidString: categoryID) {
+            let catDescriptor = FetchDescriptor<Category>(predicate: #Predicate { $0.id == uuid })
+            if let cat = (try? context.fetch(catDescriptor))?.first {
+                let existingPred = #Predicate<Session> { $0.category?.id == uuid && $0.startTime == startTime }
+                let existing = try? context.fetch(FetchDescriptor<Session>(predicate: existingPred))
+                if existing?.isEmpty != false {
+                    let session = Session(category: cat, startTime: startTime, endTime: endTime)
+                    context.insert(session)
+                    try? context.save()
+                }
+            }
+        }
         activeSession = nil
         timer?.invalidate()
         timer = nil

@@ -10,7 +10,7 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
 
     var isReachable = false
     var onRemoteStart: ((String, Date) -> Void)?
-    var onRemoteStop: (() -> Void)?
+    var onRemoteStop: ((String, Date, Date) -> Void)?
     var onRingData: (([String: TimeInterval], TimeInterval, [String: String], [String: String], [String: String]) -> Void)?
 
     private override init() {
@@ -32,8 +32,13 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         ])
     }
 
-    func sendStop() {
-        send(message: ["action": "stop"])
+    func sendStop(categoryID: String, startTime: Date, endTime: Date) {
+        send(message: [
+            "action": "stop",
+            "categoryID": categoryID,
+            "startTime": startTime,
+            "endTime": endTime
+        ])
     }
 
     func sendRingData(durations: [String: TimeInterval], total: TimeInterval, names: [String: String], icons: [String: String], colors: [String: String]) {
@@ -83,7 +88,10 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
                       let colors = message["colors"] as? [String: String] else { return }
                 self.onRingData?(durations, total, names, icons, colors)
             case "stop":
-                self.onRemoteStop?()
+                guard let id = message["categoryID"] as? String,
+                      let start = message["startTime"] as? Date,
+                      let end = message["endTime"] as? Date else { return }
+                self.onRemoteStop?(id, start, end)
             default:
                 break
             }
